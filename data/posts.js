@@ -47,6 +47,43 @@ Zrezygnowałem z wielkich zdjęć i wizualnego zgiełku. Strona działa w czysty
 
 Jeśli chcesz podyskutować o którymś z tekstów lub polecić płytę albo książkę, [napisz do mnie](mailto:kontakt@example.com).
 `
+  },
+  privacy: {
+    title: 'Polityka prywatności',
+    updated: '2026-11-22',
+    lead: 'Przejrzysta informacja o przetwarzaniu danych, plikach cookies i pamięci lokalnej przeglądarki na statycznej stronie Sploty.',
+    content: `
+Strona **Sploty** jest niekomercyjnym, statycznym dziennikiem osobistym udostępnianym za pośrednictwem usługi **GitHub Pages**. Szanuję prywatność czytelników — serwis **nie używa reklam, systemów śledzących, Google Analytics ani profilowania**.
+
+## 1. Administrator danych i kontakt
+
+Administratorem danych osobowych przekazywanych dobrowolnie w korespondencji jest autor strony (**Equimanthorn**). W sprawach związanych z prywatnością możesz skontaktować się mailowo: [kontakt@example.com](mailto:kontakt@example.com).
+
+## 2. Pliki cookies i pamięć lokalna przeglądarki
+
+Serwis nie instaluje marketingowych ani analitycznych plików cookies. Do zapamiętania wyłącznie Twoich technicznych preferencji wyglądu wykorzystuje pamięć lokalną przeglądarki (*localStorage* — technologię równoważną plikom cookies w rozumieniu przepisów ePrivacy / Prawa komunikacji elektronicznej):
+
+- **sploty_theme** — zapamiętuje wybrany motyw kolorystyczny (*Inkaust* lub *Pergamin*),
+- **sploty_font_scale** — zapamiętuje rozmiar pisma wybrany podczas lektury (*A− / A / A+*),
+- **sploty_privacy_notice** — zapisuje informację o zamknięciu komunikatu o ciasteczkach, aby nie wyświetlał się przy każdej kolejnej wizycie.
+
+Dane zapisane w pamięci lokalnej pozostają wyłącznie w Twojej przeglądarce i **nie są wysyłane na żaden serwer**. W komunikacie na dole strony możesz wybrać **tryb sesyjny** (bez trwałego zapisu w *localStorage*), a w dowolnym momencie wyczyścić zapisane ustawienia przyciskiem poniżej lub w ustawieniach przeglądarki.
+
+## 3. Zewnętrzni dostawcy techniczni
+
+Ze względów technicznych podczas ładowania strony przeglądarka nawiązuje połączenie z dwoma zewnętrznymi dostawcami:
+
+1. **GitHub Pages** (GitHub, Inc. / GitHub B.V.) — hosting plików statycznych strony. Serwery GitHub mogą przetwarzać standardowe logi techniczne połączeń (w tym adres IP) w celu zapewnienia bezpieczeństwa i ciągłości działania usługi zgodnie z [Polityką prywatności GitHub](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
+2. **Google Fonts** (Google Ireland Ltd. / Google LLC) — ładowanie krojów pisma użytych w typografii strony (*IM Fell English SC*, *Cinzel*, *EB Garamond*, *IBM Plex Mono*, *Noto Sans Runic*), co wiąże się z technicznym przekazaniem adresu IP oraz nagłówków przeglądarki do serwerów czcionek Google.
+
+## 4. Korespondencja e-mail
+
+Strona nie posiada formularzy rejestracji, logowania ani komentarzy. Jeśli dobrowolnie napiszesz wiadomość e-mail na adres podany w serwisie, Twój adres e-mail i treść korespondencji będą przetwarzane wyłącznie w celu udzielenia odpowiedzi i prowadzenia rozmowy (podstawa prawna: art. 6 ust. 1 lit. f RODO — prawnie uzasadniony interes administratora) i nie będą udostępniane podmiotom trzecim.
+
+## 5. Twoje prawa (RODO)
+
+Na gruncie rozporządzenia RODO przysługuje Ci prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania, wniesienia sprzeciwu oraz wniesienia skargi do organu nadzorczego (w Polsce: Prezes Urzędu Ochrony Danych Osobowych — [uodo.gov.pl](https://uodo.gov.pl/)).
+`
   }
 };
 

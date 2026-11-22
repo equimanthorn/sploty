@@ -253,8 +253,52 @@
   }
 
   /* ========================================================================
-     Motyw, Rozmiar pisma i Pasek postępu
+     Motyw, Rozmiar pisma, Preferencje prywatności i Pasek postępu
      ======================================================================== */
+
+  const PRIVACY_KEY = 'sploty_privacy_notice';
+  const SESSION_ONLY_KEY = 'sploty_privacy_session_only';
+
+  function isSessionOnlyPrivacy() {
+    try {
+      return sessionStorage.getItem(SESSION_ONLY_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  function canPersistPrefs() {
+    return !isSessionOnlyPrivacy();
+  }
+
+  function getPrivacyStatusText() {
+    if (isSessionOnlyPrivacy()) {
+      return 'Tryb sesyjny (preferencje motywu i pisma nie są trwale zapisywane w przeglądarce)';
+    }
+    try {
+      if (localStorage.getItem(PRIVACY_KEY) === 'accepted') {
+        return 'Aktywna pamięć lokalna (zapamiętywanie motywu i rozmiaru pisma w przeglądarce)';
+      }
+    } catch {
+      return 'Brak dostępu do pamięci lokalnej przeglądarki';
+    }
+    return 'Nie podjęto jeszcze decyzji (domyślnie bez śledzenia i reklam)';
+  }
+
+  function clearStoredPrefs() {
+    try {
+      localStorage.removeItem('sploty_theme');
+      localStorage.removeItem('sploty_font_scale');
+      localStorage.removeItem(PRIVACY_KEY);
+    } catch {
+      /* ignore */
+    }
+    try {
+      sessionStorage.removeItem(SESSION_ONLY_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
 
   function applyFontScale(scale) {
     state.fontScale = scale;
@@ -263,7 +307,13 @@
     } else {
       document.documentElement.setAttribute('data-font-scale', scale);
     }
-    localStorage.setItem('sploty_font_scale', scale);
+    if (canPersistPrefs()) {
+      try {
+        localStorage.setItem('sploty_font_scale', scale);
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
   if (themeToggleEl) {
@@ -271,8 +321,88 @@
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('sploty_theme', next);
+      if (canPersistPrefs()) {
+        try {
+          localStorage.setItem('sploty_theme', next);
+        } catch {
+          /* ignore */
+        }
+      }
     });
+  }
+
+  const cookieBannerEl = document.getElementById('cookie-banner');
+  const cookieAcceptEl = document.getElementById('cookie-accept-btn');
+  const cookieSessionEl = document.getElementById('cookie-session-btn');
+
+  function openCookieBanner() {
+    if (!cookieBannerEl) return;
+    cookieBannerEl.hidden = false;
+    requestAnimationFrame(() => {
+      cookieBannerEl.classList.add('is-visible');
+    });
+  }
+
+  function closeCookieBanner() {
+    if (!cookieBannerEl) return;
+    cookieBannerEl.classList.remove('is-visible');
+    setTimeout(() => {
+      if (!cookieBannerEl.classList.contains('is-visible')) {
+        cookieBannerEl.hidden = true;
+      }
+    }, 260);
+  }
+
+  function refreshPrivacyStatusIfVisible() {
+    const statusEl = document.getElementById('privacy-status-text');
+    if (statusEl) {
+      statusEl.textContent = getPrivacyStatusText();
+    }
+  }
+
+  function initCookieBanner() {
+    if (!cookieBannerEl) return;
+
+    if (cookieAcceptEl) {
+      cookieAcceptEl.addEventListener('click', () => {
+        try {
+          sessionStorage.removeItem(SESSION_ONLY_KEY);
+          localStorage.setItem(PRIVACY_KEY, 'accepted');
+        } catch {
+          /* ignore */
+        }
+        closeCookieBanner();
+        refreshPrivacyStatusIfVisible();
+        showToast('Zapisano ustawienia pamięci lokalnej');
+      });
+    }
+
+    if (cookieSessionEl) {
+      cookieSessionEl.addEventListener('click', () => {
+        clearStoredPrefs();
+        try {
+          sessionStorage.setItem(SESSION_ONLY_KEY, '1');
+        } catch {
+          /* ignore */
+        }
+        closeCookieBanner();
+        refreshPrivacyStatusIfVisible();
+        showToast('Włączono tryb sesyjny — bez trwałego zapisu');
+      });
+    }
+
+    let decided = isSessionOnlyPrivacy();
+    if (!decided) {
+      try {
+        decided = localStorage.getItem(PRIVACY_KEY) === 'accepted';
+      } catch {
+        decided = false;
+      }
+    }
+
+    if (!decided) {
+      openCookieBanner();
+    }
   }
 
   // Kinetyczne linie w nagłówku (subtelna reakcja na ruch kursora)
@@ -418,6 +548,7 @@
   initKineticThreads();
   initAstrolabeMorph();
   initRagnarokClock();
+  initCookieBanner();
 
   let isReadingArticle = false;
 
@@ -467,15 +598,23 @@
         { label: 'Wątki', url: '#/watki' },
         { label: 'Miscellanea', url: '#/miscellanea' },
         { label: 'O mnie', url: '#/o-mnie' },
+        { label: 'Polityka prywatności', url: '#/polityka-prywatnosci' },
         ...(config.footerLinks || [])
       ];
-      linksEl.innerHTML = navLinks
-        .map((link) => {
-          const href = sanitizeUrl(link.url);
-          const ext = /^https?:\/\//i.test(href) ? ' target="_blank" rel="noopener noreferrer"' : '';
-          return `<a href="${escapeHtml(href)}"${ext}>${escapeHtml(link.label)}</a>`;
-        })
-        .join('');
+      linksEl.innerHTML =
+        navLinks
+          .map((link) => {
+            const href = sanitizeUrl(link.url);
+            const ext = /^https?:\/\//i.test(href) ? ' target="_blank" rel="noopener noreferrer"' : '';
+            return `<a href="${escapeHtml(href)}"${ext}>${escapeHtml(link.label)}</a>`;
+          })
+          .join('') +
+        `<button type="button" class="colophon-link-btn" id="open-cookie-settings-btn">Cookies</button>`;
+
+      const openCookieBtn = document.getElementById('open-cookie-settings-btn');
+      if (openCookieBtn) {
+        openCookieBtn.addEventListener('click', openCookieBanner);
+      }
     }
   }
 
@@ -1013,6 +1152,73 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
+  /* ========================================================================
+     Widok 5: Polityka prywatności (#/polityka-prywatnosci)
+     ======================================================================== */
+
+  function renderPrivacy() {
+    isReadingArticle = false;
+    updateReadingProgress();
+    setActiveNav('');
+
+    const privacy = config.privacy || {
+      title: 'Polityka prywatności',
+      updated: '2026-11-22',
+      lead: 'Informacja o przetwarzaniu danych i pamięci lokalnej przeglądarki.',
+      content: ''
+    };
+
+    document.title = `${privacy.title} — ${config.siteName}`;
+    const parsed = renderMarkdown(privacy.content);
+
+    appEl.innerHTML = `
+      <article class="reveal">
+        <div class="reader-bar">
+          <a href="#/" class="back-btn">← Powrót do spisu</a>
+        </div>
+
+        <header class="article-header">
+          <div class="article-kicker">
+            <span class="kicker-thread">${escapeHtml(config.siteName)}</span>
+            ${privacy.updated ? `<span>·</span><span>Aktualizacja: ${formatLongDate(privacy.updated)}</span>` : ''}
+          </div>
+          <h1 class="article-title">${escapeHtml(privacy.title)}</h1>
+          ${privacy.lead ? `<p class="article-standfirst">${escapeHtml(privacy.lead)}</p>` : ''}
+        </header>
+
+        <div class="prose">
+          ${parsed.html}
+        </div>
+
+        <section class="privacy-controls" aria-label="Zarządzanie ustawieniami prywatności">
+          <p class="privacy-status">
+            <strong>Bieżący tryb:</strong> <span id="privacy-status-text">${escapeHtml(getPrivacyStatusText())}</span>
+          </p>
+          <div class="privacy-actions">
+            <button type="button" id="privacy-reopen-banner" class="cookie-btn cookie-btn-primary">Zmień ustawienia cookies</button>
+            <button type="button" id="privacy-clear-storage" class="cookie-btn">Wyczyść zapisane preferencje</button>
+          </div>
+        </section>
+      </article>
+    `;
+
+    const reopenBtn = document.getElementById('privacy-reopen-banner');
+    if (reopenBtn) {
+      reopenBtn.addEventListener('click', openCookieBanner);
+    }
+
+    const clearBtn = document.getElementById('privacy-clear-storage');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        clearStoredPrefs();
+        refreshPrivacyStatusIfVisible();
+        showToast('Wyczyszczono zapisane preferencje w przeglądarce');
+      });
+    }
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
   function renderNotFound() {
     isReadingArticle = false;
     updateReadingProgress();
@@ -1059,6 +1265,11 @@
 
     if (hash === '#/o-mnie') {
       renderAbout();
+      return;
+    }
+
+    if (hash === '#/polityka-prywatnosci') {
+      renderPrivacy();
       return;
     }
 
