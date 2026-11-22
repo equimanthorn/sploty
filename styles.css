@@ -1,0 +1,1620 @@
+/* ==========================================================================
+   Sploty — Powściągliwy minimalizm książkowy z nordyckim akcentem
+   Kroje: IM Fell English SC (tytuł) + Cinzel (kapitała) + EB Garamond (antykwa) + Noto Sans Runic
+   Motywy: Inkaust (domyślny) & Pergamin — kontrast WCAG AA/AAA
+   ========================================================================== */
+
+:root {
+  /* Tryb ciemny — Pruski Inkaust (głęboki atramentowy granat, kość, cynober, stare złoto) */
+  --bg: #171E29;
+  --bg-soft: #202938;
+  --ink: #EAE4D8;
+  --ink-secondary: #C6C0B4;
+  --ink-muted: #9BA3B0;
+  --accent: #D67D66;
+  --accent-soft: rgba(214, 125, 102, 0.14);
+  --gold: #D4B46A;
+  --gold-soft: rgba(212, 180, 106, 0.12);
+  --gold-faint: rgba(212, 180, 106, 0.34);
+  --ghost: rgba(234, 228, 216, 0.045);
+  --rule: #2C374A;
+  --rule-strong: #415069;
+
+  --font-brand: 'IM Fell English SC', 'EB Garamond', Georgia, serif;
+  --font-display: 'Cinzel', 'EB Garamond', Georgia, serif;
+  --font-body: 'EB Garamond', 'Noto Sans Runic', Georgia, 'Times New Roman', serif;
+  --font-runic: 'Noto Sans Runic', 'Segoe UI Historic', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --body-size: 1.24rem;
+  --shell-width: 760px;
+  --transition: 220ms ease;
+}
+
+[data-theme="light"] {
+  /* Tryb jasny — Nordycki Pergamin (chłodny papier czerpany + pruski atrament #171E29) */
+  --bg: #F2F4F7;
+  --bg-soft: #E7ECF2;
+  --ink: #171E29;
+  --ink-secondary: #384457;
+  --ink-muted: #536278;
+  --accent: #9E3228;
+  --accent-soft: rgba(158, 50, 40, 0.09);
+  --gold: #7A5912;
+  --gold-soft: rgba(122, 89, 18, 0.08);
+  --gold-faint: rgba(122, 89, 18, 0.34);
+  --ghost: rgba(23, 30, 41, 0.05);
+  --rule: #CED6E2;
+  --rule-strong: #A1AEBF;
+}
+
+[data-font-scale="sm"] {
+  --body-size: 1.12rem;
+}
+
+[data-font-scale="lg"] {
+  --body-size: 1.38rem;
+}
+
+/* Reset i baza typograficzna */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: 1.74;
+  font-feature-settings: "liga", "dlig", "kern", "onum";
+  transition: background-color var(--transition), color var(--transition);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-shell {
+  width: 100%;
+  max-width: var(--shell-width);
+  margin: 0 auto;
+  padding: 0 28px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cienki pasek postępu lektury */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background-color: var(--accent);
+  opacity: 0;
+  z-index: 100;
+  transition: opacity 200ms ease;
+}
+
+.reading-progress.is-visible {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Bezramkowy, pełnoszerokościowy nagłówek (Kamień runiczny + Astrolabium z przemianą co 360°)
+   ========================================================================== */
+
+@keyframes astroTurn {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes astroTurnRev {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.masthead {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: none;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(to bottom, transparent 40%, var(--bg) 100%),
+    radial-gradient(520px 220px at 18% 42%, var(--gold-soft), transparent 72%),
+    radial-gradient(520px 220px at 82% 42%, var(--accent-soft), transparent 72%),
+    linear-gradient(to bottom, var(--bg-soft) 0%, var(--bg-soft) 34%, var(--bg) 96%);
+  color: var(--ink);
+  transition: background-color var(--transition), color var(--transition);
+}
+
+/* Miękki woal u dołu nagłówka — całkowicie rozpuszcza przejście w tło strony bez ostrej krawędzi */
+.masthead::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 18%,
+    var(--bg) 100%
+  );
+}
+
+/* Symetryczny dyptyk rysowany wektorowo: lewe skrzydło słowiańskie, prawe nordyckie (wygaszone ku centrum i ku dołowi) */
+.masthead-slavic-art,
+.masthead-runestone-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.masthead-slavic-art {
+  -webkit-mask-image:
+    linear-gradient(to right, #000 0%, #000 32%, rgba(0, 0, 0, 0.24) 50%, transparent 64%),
+    linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, 0.35) 82%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, #000 0%, #000 32%, rgba(0, 0, 0, 0.24) 50%, transparent 64%),
+    linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, 0.35) 82%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.masthead-runestone-art {
+  -webkit-mask-image:
+    linear-gradient(to left, #000 0%, #000 32%, rgba(0, 0, 0, 0.24) 50%, transparent 64%),
+    linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, 0.35) 82%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to left, #000 0%, #000 32%, rgba(0, 0, 0, 0.24) 50%, transparent 64%),
+    linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, 0.35) 82%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.ribbon-runes {
+  font-family: var(--font-runic);
+}
+
+/* Cienkie kinetyczne linie w tle nagłówka (reagują na ruch kursora i miękko zanikają u dołu) */
+.masthead-threads {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 62%, rgba(0, 0, 0, 0.35) 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 62%, rgba(0, 0, 0, 0.35) 84%, transparent 100%);
+}
+
+@media (max-width: 960px) {
+  .masthead-slavic-art,
+  .masthead-runestone-art {
+    opacity: 0.48;
+  }
+}
+
+.masthead-inner {
+  position: relative;
+  z-index: 3;
+  max-width: var(--shell-width);
+  margin: 0 auto;
+  padding: 26px 28px 66px;
+}
+
+/* Górny bezramkowy pasek nawigacji */
+.masthead-bar {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  margin-bottom: 38px;
+}
+
+.masthead-edition {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.edition-runes {
+  font-family: var(--font-runic);
+  font-size: 0.88rem;
+  letter-spacing: 0.24em;
+  color: var(--gold);
+}
+
+.edition-sep {
+  opacity: 0.55;
+}
+
+.masthead-bar-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+}
+
+.masthead-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+}
+
+.nav-item {
+  position: relative;
+  padding-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  transition: color 180ms ease;
+}
+
+.nav-item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background-color: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-item:hover,
+.nav-item.is-active {
+  color: var(--ink);
+}
+
+.nav-item:hover::after,
+.nav-item.is-active::after {
+  transform: scaleX(1);
+}
+
+.theme-pill {
+  padding: 4px 12px;
+  border: 1px solid var(--gold-faint);
+  border-radius: 2px;
+  background: var(--bg-soft);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background-color var(--transition);
+}
+
+.theme-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-theme="light"] .theme-label-dark,
+[data-theme="dark"] .theme-label-light {
+  display: none;
+}
+
+/* Przearanżowana scena główna: Astrolabium po lewej + Tytuł po prawej */
+.masthead-hero {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  padding-bottom: 18px;
+}
+
+.astrolabe-stage {
+  position: relative;
+  width: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.masthead-astrolabe {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.35));
+}
+
+[data-theme="light"] .masthead-astrolabe {
+  filter: none;
+}
+
+.astro-aura {
+  opacity: 0;
+  transform-origin: 90px 90px;
+  transform: scale(0.68);
+  pointer-events: none;
+}
+
+.astro-pulse-ring {
+  opacity: 0;
+  transform-origin: 90px 90px;
+  transform: scale(0.92);
+  pointer-events: none;
+}
+
+@keyframes astroAuraBloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.66);
+  }
+  28% {
+    opacity: 0.72;
+    transform: scale(1.06);
+  }
+  65% {
+    opacity: 0.3;
+    transform: scale(1.18);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.26);
+  }
+}
+
+@keyframes astroPulseRing {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  20% {
+    opacity: 0.68;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.52);
+  }
+}
+
+@keyframes astroSymbolRadiance {
+  0% {
+    filter: blur(1.6px) drop-shadow(0 0 12px var(--gold)) drop-shadow(0 0 24px var(--accent)) brightness(1.7);
+  }
+  32% {
+    filter: blur(0px) drop-shadow(0 0 10px var(--gold)) drop-shadow(0 0 20px var(--accent)) brightness(1.42);
+  }
+  70% {
+    filter: drop-shadow(0 0 4px var(--gold-faint)) brightness(1.12);
+  }
+  100% {
+    filter: drop-shadow(0 0 1.5px var(--gold-faint)) brightness(1);
+  }
+}
+
+@keyframes astroSymbolRadianceLight {
+  0% {
+    filter: blur(1.4px) drop-shadow(0 0 10px rgba(184, 134, 34, 0.75)) drop-shadow(0 0 18px rgba(158, 50, 40, 0.48)) brightness(1.26);
+  }
+  35% {
+    filter: blur(0px) drop-shadow(0 0 8px rgba(184, 134, 34, 0.58)) drop-shadow(0 0 14px rgba(158, 50, 40, 0.32)) brightness(1.14);
+  }
+  100% {
+    filter: drop-shadow(0 0 0px transparent) brightness(1);
+  }
+}
+
+.masthead-astrolabe.is-radiant .astro-aura {
+  animation: astroAuraBloom 1750ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.masthead-astrolabe.is-radiant .astro-pulse-ring {
+  animation: astroPulseRing 1500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.astro-outer {
+  transform-origin: 90px 90px;
+  animation: astroTurnRev 36s linear infinite;
+}
+
+/* Dokładnie jeden pełny obrót 360° co 10 sekund — po każdym obrocie zmienia się symbol */
+.astro-inner {
+  transform-origin: 90px 90px;
+  animation: astroTurn 10s linear infinite;
+}
+
+.astro-symbol {
+  opacity: 0;
+  transform-origin: 90px 90px;
+  transform: scale(0.92);
+  transition:
+    opacity 1150ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 1250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.astro-symbol.is-active {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 1350ms cubic-bezier(0.22, 1, 0.36, 1) 180ms,
+    transform 1400ms cubic-bezier(0.22, 1, 0.36, 1) 180ms;
+}
+
+.astro-symbol.is-emerging {
+  animation: astroSymbolRadiance 1800ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both;
+}
+
+[data-theme="light"] .astro-symbol.is-emerging {
+  animation: astroSymbolRadianceLight 1800ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both;
+}
+
+.astro-caption {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  white-space: nowrap;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.85;
+  pointer-events: none;
+  transition: opacity 420ms ease, text-shadow 650ms ease, transform 420ms ease;
+}
+
+.astro-caption.is-fading {
+  opacity: 0;
+  transform: translateX(-50%) translateY(2px);
+}
+
+.astro-caption.is-glowing {
+  opacity: 0.98;
+  text-shadow: 0 0 12px var(--gold);
+}
+
+.masthead-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.brand-link {
+  display: inline-block;
+}
+
+.brand-name {
+  display: block;
+  font-family: var(--font-brand);
+  font-size: clamp(3.2rem, 8.2vw, 5.1rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 0.94;
+  color: var(--ink);
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.45);
+  transition: color var(--transition);
+}
+
+[data-theme="light"] .brand-name,
+[data-theme="light"] .brand-tagline {
+  text-shadow: none;
+}
+
+.brand-link:hover .brand-name {
+  color: var(--accent);
+}
+
+.brand-cut-rule {
+  height: 2px;
+  margin-top: 16px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--gold) 52%, transparent 100%);
+}
+
+.brand-tagline {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--font-body);
+  font-size: 1.08rem;
+  font-style: italic;
+  color: var(--ink-secondary);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
+}
+
+.ragnarok-clock {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+
+.ragnarok-clock:hover {
+  color: var(--ink);
+}
+
+.ragnarok-label {
+  font-family: var(--font-display);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ragnarok-sep {
+  color: var(--gold);
+  opacity: 0.65;
+}
+
+.ragnarok-time {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold);
+}
+
+.era-ragnarok {
+  font-family: var(--font-display);
+  font-size: 0.7em;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  opacity: 0.85;
+  margin-left: 2px;
+}
+
+.era-ragnarok-long {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.runic-term {
+  font-family: var(--font-runic);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .astro-outer,
+  .astro-inner,
+  .masthead-astrolabe.is-radiant .astro-aura,
+  .masthead-astrolabe.is-radiant .astro-pulse-ring,
+  .astro-symbol.is-emerging {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Główna treść
+   ========================================================================== */
+
+.main {
+  flex: 1;
+  padding: 32px 0 80px;
+  outline: none;
+}
+
+@keyframes gentleReveal {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  animation: gentleReveal 300ms ease both;
+}
+
+/* Wprowadzenie */
+.journal-intro {
+  max-width: 56ch;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.journal-intro p {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.1vw, 1.36rem);
+  font-style: italic;
+  line-height: 1.62;
+  color: var(--ink-secondary);
+}
+
+.journal-intro em {
+  color: var(--ink);
+  font-style: normal;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.04em;
+}
+
+/* Pasek filtrów i wyszukiwania */
+.index-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.thread-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.thread-chip {
+  padding: 2px 0;
+  border: none;
+  border-bottom: 1.5px solid transparent;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.thread-chip:hover {
+  color: var(--ink);
+}
+
+.thread-chip.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.thread-count {
+  font-family: var(--font-body);
+  font-size: 0.94em;
+  opacity: 0.8;
+  margin-left: 3px;
+}
+
+.index-search {
+  width: 190px;
+  padding: 4px 0;
+  border: none;
+  border-bottom: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-style: italic;
+  outline: none;
+  transition: border-color var(--transition), width var(--transition);
+}
+
+.index-search::placeholder {
+  color: var(--ink-muted);
+}
+
+.index-search:focus {
+  width: 225px;
+  border-bottom-color: var(--accent);
+}
+
+/* ==========================================================================
+   Spis treści — przestronne, czyste wiersze bez zbędnych ramek
+   ========================================================================== */
+
+.toc-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.toc-row {
+  display: grid;
+  grid-template-columns: 44px 130px minmax(0, 1fr);
+  gap: 8px 22px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--rule);
+  transition: border-color var(--transition);
+}
+
+.toc-row:hover {
+  border-bottom-color: var(--rule-strong);
+}
+
+.toc-index {
+  padding-top: 6px;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+
+.toc-row:hover .toc-index {
+  color: var(--accent);
+}
+
+.toc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 6px;
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}
+
+.toc-thread {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.toc-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toc-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.24;
+  color: var(--ink);
+  transition: color var(--transition);
+}
+
+.toc-row:hover .toc-title {
+  color: var(--accent);
+}
+
+.toc-arrow {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.8em;
+  color: var(--gold);
+  opacity: 0;
+  transform: translateX(-5px);
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.toc-row:hover .toc-arrow {
+  opacity: 0.9;
+  transform: translateX(0);
+}
+
+.toc-excerpt {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.62;
+  color: var(--ink-secondary);
+}
+
+.toc-readtime {
+  font-size: 0.84rem;
+  font-style: italic;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+
+.empty-note {
+  padding: 52px 0;
+  text-align: center;
+  color: var(--ink-secondary);
+  font-style: italic;
+}
+
+.btn-ghost {
+  margin-top: 14px;
+  padding: 7px 16px;
+  border: 1px solid var(--gold-faint);
+  border-radius: 2px;
+  background: var(--bg-soft);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   Widok Wątków (#/watki) & Miscellanea (#/miscellanea)
+   ========================================================================== */
+
+.page-title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.45rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.16;
+}
+
+.page-lead {
+  margin: 0 0 38px;
+  font-size: 1.12rem;
+  font-style: italic;
+  color: var(--ink-secondary);
+  max-width: 58ch;
+}
+
+.thread-group {
+  margin-bottom: 44px;
+}
+
+.thread-group-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.thread-group-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.thread-group-count {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--ink-muted);
+}
+
+.compact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.compact-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.compact-item a {
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+
+.compact-item a:hover {
+  color: var(--accent);
+}
+
+.compact-date {
+  flex-shrink: 0;
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}
+
+/* Sekcja Miscellanea */
+.misc-etymology {
+  margin: 0 0 38px;
+  padding: 18px 22px;
+  background: var(--bg-soft);
+  border-left: 2px solid var(--gold);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--ink-secondary);
+}
+
+.misc-etymology-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.misc-etymology p {
+  margin: 0;
+}
+
+.misc-etymology em {
+  color: var(--ink);
+  font-style: italic;
+}
+
+.misc-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.misc-entry {
+  display: grid;
+  grid-template-columns: 145px minmax(0, 1fr);
+  gap: 8px 24px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.misc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 5px;
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}
+
+.misc-kind {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.misc-body {
+  min-width: 0;
+}
+
+.misc-title {
+  margin: 0 0 8px;
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.24;
+  color: var(--ink);
+}
+
+.misc-text p {
+  margin: 0 0 0.85em;
+}
+
+.misc-text p:last-child {
+  margin-bottom: 0;
+}
+
+.misc-text a {
+  color: var(--ink);
+  border-bottom: 1px solid var(--accent);
+  transition: color var(--transition);
+}
+
+.misc-text a:hover {
+  color: var(--accent);
+}
+
+.misc-source {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--ink-muted);
+}
+
+.misc-source a {
+  color: var(--ink-secondary);
+  border-bottom: 1px solid var(--rule-strong);
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.misc-source a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ==========================================================================
+   Widok artykułu (#/wpis/<slug>)
+   ========================================================================== */
+
+.reader-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 42px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--transition);
+}
+
+.back-btn:hover {
+  color: var(--accent);
+}
+
+.reader-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reader-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  background: var(--bg-soft);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.reader-btn:hover,
+.reader-btn.is-active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.article-header {
+  text-align: center;
+  margin-bottom: 38px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.article-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.kicker-thread {
+  color: var(--accent);
+}
+
+.article-title {
+  margin: 0 auto 18px;
+  max-width: 24ch;
+  font-family: var(--font-body);
+  font-size: clamp(2.1rem, 4.6vw, 2.95rem);
+  font-weight: 600;
+  line-height: 1.16;
+  text-wrap: balance;
+}
+
+.article-standfirst {
+  margin: 0 auto;
+  max-width: 54ch;
+  font-size: 1.14rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+}
+
+/* Mini spis sekcji */
+.section-toc {
+  margin: 0 0 36px;
+  padding: 16px 20px;
+  background: var(--bg-soft);
+  border-left: 2px solid var(--gold);
+}
+
+.section-toc-label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.section-toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+}
+
+.section-toc a {
+  font-size: 0.98rem;
+  color: var(--ink-secondary);
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.section-toc a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Proza + czysty, typograficzny inicjał (bez ciężkich ramek) */
+.prose {
+  max-width: 62ch;
+  margin: 0 auto;
+}
+
+.prose > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-display);
+  font-size: 3.35em;
+  font-weight: 600;
+  line-height: 0.84;
+  padding: 6px 12px 0 0;
+  color: var(--accent);
+}
+
+.prose p {
+  margin: 0 0 1.35em;
+}
+
+.prose h2 {
+  margin: 2.3em 0 0.7em;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.3;
+  color: var(--ink);
+  scroll-margin-top: 28px;
+}
+
+.prose h3 {
+  margin: 1.8em 0 0.5em;
+  font-family: var(--font-body);
+  font-size: 1.24rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+.prose a {
+  color: var(--ink);
+  border-bottom: 1px solid var(--accent);
+  transition: color var(--transition);
+}
+
+.prose a:hover {
+  color: var(--accent);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.45em;
+  padding-left: 1.45em;
+}
+
+.prose li {
+  margin-bottom: 0.45em;
+}
+
+.prose blockquote {
+  margin: 2em 0;
+  padding: 14px 22px;
+  border-left: 2px solid var(--accent);
+  background: var(--bg-soft);
+  font-style: italic;
+  color: var(--ink-secondary);
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  padding: 2px 6px;
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+}
+
+.prose pre {
+  margin: 1.8em 0;
+  padding: 16px 20px;
+  overflow-x: auto;
+  background: var(--bg-soft);
+  border-left: 2px solid var(--gold);
+  font-size: 0.82rem;
+  line-height: 1.58;
+}
+
+.prose pre code {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* Pojedyncza, cicha runa Othala jako separator sekcji */
+.prose hr {
+  border: none;
+  margin: 2.6em 0;
+  text-align: center;
+}
+
+.prose hr::after {
+  content: 'ᛟ';
+  font-family: var(--font-runic);
+  font-size: 1.15rem;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+/* Stopka artykułu */
+.article-end {
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule-strong);
+}
+
+.related-box {
+  margin-bottom: 30px;
+  padding: 18px 22px;
+  background: var(--bg-soft);
+}
+
+.related-label {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.article-pager {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px 18px;
+  border: 1px solid var(--rule);
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.pager-link:hover {
+  border-color: var(--accent);
+  background: var(--bg-soft);
+}
+
+.pager-link.next {
+  grid-column: 2;
+  text-align: right;
+}
+
+.pager-dir {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.pager-title {
+  font-family: var(--font-body);
+  font-size: 1.16rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Pełnoekranowe tło strony w sekcji O mnie (#/o-mnie) */
+body.is-about-page {
+  position: relative;
+  background-color: var(--bg);
+}
+
+body.is-about-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--about-bg, url('images/equimanthorn.jpg'));
+  background-size: cover;
+  background-position: center 18%;
+  background-repeat: no-repeat;
+  opacity: 0.36;
+  pointer-events: none;
+  transition: opacity 320ms ease, filter 320ms ease;
+}
+
+body.is-about-page::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at center 28%, rgba(23, 30, 41, 0.45) 0%, rgba(23, 30, 41, 0.86) 72%, rgba(23, 30, 41, 0.96) 100%);
+  pointer-events: none;
+}
+
+body.is-about-page .masthead {
+  background-color: transparent;
+  background-image: linear-gradient(to bottom, rgba(23, 30, 41, 0.68) 0%, rgba(23, 30, 41, 0.26) 62%, transparent 100%);
+}
+
+body.is-about-page .masthead::after {
+  display: none;
+}
+
+[data-theme="light"] body.is-about-page::before {
+  opacity: 0.22;
+  filter: grayscale(0.35) contrast(0.92);
+}
+
+[data-theme="light"] body.is-about-page::after {
+  background: radial-gradient(ellipse at center 28%, rgba(242, 244, 247, 0.56) 0%, rgba(242, 244, 247, 0.88) 72%, rgba(242, 244, 247, 0.96) 100%);
+}
+
+[data-theme="light"] body.is-about-page .masthead {
+  background-color: transparent;
+  background-image: linear-gradient(to bottom, rgba(242, 244, 247, 0.74) 0%, rgba(242, 244, 247, 0.3) 62%, transparent 100%);
+}
+
+/* ==========================================================================
+   Kolofon (cicha, elegancka stopka)
+   ========================================================================== */
+
+.colophon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 28px 0 40px;
+  border-top: 1px solid var(--rule);
+}
+
+.colophon-right {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 24px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.colophon-right a {
+  color: var(--ink-secondary);
+  transition: color var(--transition);
+}
+
+.colophon-right a:hover {
+  color: var(--accent);
+}
+
+.colophon-left {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--ink-muted);
+}
+
+.colophon-author {
+  font-family: var(--font-runic);
+  font-style: normal;
+  font-size: 0.98rem;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+
+.colophon-ragnarok {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+  opacity: 0.88;
+}
+
+.colophon-ragnarok .runic-term {
+  color: var(--accent);
+}
+
+/* Powiadomienie Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 14px);
+  padding: 8px 18px;
+  border: 1px solid var(--gold-faint);
+  background: var(--bg-soft);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 220ms ease;
+  z-index: 200;
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ==========================================================================
+   Responsywność
+   ========================================================================== */
+
+@media (max-width: 720px) {
+  .page-shell {
+    padding: 0 20px;
+  }
+
+  .masthead-inner {
+    padding: 20px 20px 52px;
+  }
+
+  .masthead-bar {
+    margin-bottom: 26px;
+  }
+
+  .masthead-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    padding-bottom: 0;
+  }
+
+  .astrolabe-stage {
+    width: 132px;
+  }
+
+  .masthead-astrolabe {
+    width: 132px;
+    height: 132px;
+  }
+
+  .astro-caption {
+    left: 0;
+    transform: none;
+  }
+
+  .masthead-nav {
+    gap: 10px 16px;
+  }
+
+  .main {
+    padding: 22px 0 56px;
+  }
+
+  .toc-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 22px 0;
+  }
+
+  .toc-index {
+    padding-top: 0;
+    font-size: 0.82rem;
+  }
+
+  .toc-meta,
+  .misc-meta {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding-top: 0;
+  }
+
+  .misc-entry {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 20px 0;
+  }
+
+  .index-search,
+  .index-search:focus {
+    width: 100%;
+  }
+
+  .article-pager {
+    grid-template-columns: 1fr;
+  }
+
+  .pager-link.next {
+    grid-column: 1;
+    text-align: left;
+  }
+}

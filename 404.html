@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Sploty</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='3' fill='%23171E29'/%3E%3Ccircle cx='16' cy='16' r='11.5' fill='none' stroke='%23D4B46A' stroke-width='1.2'/%3E%3Cpolygon points='16,5.5 22.1,24.4 6.1,12.7 25.9,12.7 9.9,24.4' fill='none' stroke='%23D67D66' stroke-width='1.25' stroke-linejoin='miter'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+Runic&display=swap" rel="stylesheet" />
+  <script>
+    (function () {
+      const saved = localStorage.getItem('sploty_theme');
+      const valid = saved === 'light' || saved === 'dark' ? saved : 'dark';
+      document.documentElement.setAttribute('data-theme', valid);
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <main class="main" style="display: flex; flex-direction: column; justify-content: center; text-align: center;">
+      <svg class="brand-mark" viewBox="0 0 44 28" width="32" height="20" fill="none" aria-hidden="true" style="margin: 0 auto 18px;">
+        <polygon points="22,2 13,18 31,18" stroke="currentColor" stroke-width="1.2" />
+        <polygon points="17.5,10 8.5,26 26.5,26" stroke="currentColor" stroke-width="1.2" />
+        <polygon points="26.5,10 17.5,26 35.5,26" stroke="currentColor" stroke-width="1.2" />
+      </svg>
+      <div class="article-kicker">
+        <span class="kicker-thread">Sploty</span>
+        <span>·</span>
+        <span>Karta nieznaleziona (CDIV)</span>
+      </div>
+      <h1 class="article-title">Strona nie istnieje</h1>
+      <p class="article-standfirst" style="margin-bottom: 28px;">Ten wątek nie prowadzi do żadnego z zapisanych tekstów.</p>
+      <p><a href="./" class="btn-ghost" style="display: inline-block;">← Powrót do indeksu</a></p>
+    </main>
+  </div>
+</body>
+</html>

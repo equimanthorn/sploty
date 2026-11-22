@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sploty — Technologia · Muzyka · Filozofia · Język · Północ · Piastowie</title>
+  <meta name="description" content="Sploty — minimalistyczny dziennik o technologii, muzyce death i black metalowej, filozofii, języku, kulturze północy oraz państwie Piastów i wczesnym polskim średniowieczu." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='3' fill='%23171E29'/%3E%3Ccircle cx='16' cy='16' r='11.5' fill='none' stroke='%23D4B46A' stroke-width='1.2'/%3E%3Cpolygon points='16,5.5 22.1,24.4 6.1,12.7 25.9,12.7 9.9,24.4' fill='none' stroke='%23D67D66' stroke-width='1.25' stroke-linejoin='miter'/%3E%3C/svg%3E" />
+
+  <!-- Zdyscyplinowany zestaw krojów: IM Fell English SC (tytuł), Cinzel (kapitała), EB Garamond (antykwa), Noto Sans Runic (runy) + Mono (kod) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=IM+Fell+English+SC&family=Noto+Sans+Runic&display=swap" rel="stylesheet" />
+
+  <!-- Przywrócenie zapisanego motywu (Inkaust lub Pergamin) i rozmiaru pisma -->
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('sploty_theme');
+      const validTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
+      document.documentElement.setAttribute('data-theme', validTheme);
+
+      const savedScale = localStorage.getItem('sploty_font_scale');
+      if (savedScale) {
+        document.documentElement.setAttribute('data-font-scale', savedScale);
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Cienka linia postępu lektury -->
+  <div id="reading-progress" class="reading-progress" aria-hidden="true"></div>
+
+  <!-- Bezramkowy, pełnoszerokościowy nagłówek: symetryczny dyptyk — winieta słowiańska (lewa) i kamień runiczny (prawa) + cienkie nici kinetyczne -->
+  <header class="masthead" id="masthead-interactive">
+    <!-- Warstwa 1a: Rysowana wektorowo winieta słowiańsko-piastowska po lewej (łuk z fryzem falistym, Gwiazda Peruna, Łunnica, Ręce Boga, Włócznia św. Maurycego, Denar Princes Polonie) -->
+    <svg class="masthead-slavic-art" viewBox="0 0 1200 320" preserveAspectRatio="xMinYMid slice" fill="none" aria-hidden="true">
+      <!-- Zarys ciosanego dębu / spękania kamienia po lewej (lustro prawego monolitu) -->
+      <path d="M 170,-10 L 138,54 L 156,122 L 122,195 L 154,274 L 128,330" stroke="var(--rule-strong)" stroke-width="0.9" opacity="0.32" />
+      <path d="M 320,22 L 284,58 L 298,94" stroke="var(--rule-strong)" stroke-width="0.7" opacity="0.26" />
+      <path d="M 48,20 L 24,105 L 42,210 L 16,310" stroke="var(--rule-strong)" stroke-width="0.8" opacity="0.28" />
+
+      <!-- Wtórna przeplatająca się wstęga z Łunnicą i wczesnopiastowskim medalionem denara -->
+      <g opacity="0.32">
+        <path d="M 232,-14 C 308,76 156,128 238,210 C 288,260 198,292 106,328" stroke="var(--gold)" stroke-width="1.3" />
+        <path d="M 218,-14 C 292,76 142,128 224,210 C 272,258 182,288 92,328" stroke="var(--gold)" stroke-width="0.95" />
+        <!-- Zawieszka księżycowa (Łunnica) równoważąca zawijas Urnes po prawej -->
+        <g transform="translate(298, 126) scale(0.72)">
+          <circle cx="0" cy="-16" r="3.4" stroke="var(--gold)" stroke-width="1.2" />
+          <path d="M0,-12 C-17,-12 -28,1 -26,20 C-19,8 -10,3 0,3 C10,3 19,8 26,20 C28,1 17,-12 0,-12 Z" stroke="var(--accent)" stroke-width="1.35" stroke-linejoin="round" />
+          <polygon points="0,-8 4.5,0 -4.5,0" stroke="var(--gold)" stroke-width="1.05" />
+        </g>
+      </g>
+
+      <!-- Wczesnopiastowski ryt Włóczni św. Maurycego (Zjazd Gnieźnieński 1000 r.) w lewym górnym skrzydle -->
+      <g transform="translate(60, 74) rotate(-26) scale(0.95)" opacity="0.34">
+        <path d="M0,-32 C4.5,-20 8,-8 4.5,6 L2.5,12 L2.5,30 L-2.5,30 L-2.5,12 L-4.5,6 C-8,-8 -4.5,-20 0,-32 Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="miter" />
+        <path d="M0,-17 C2.2,-10 2.2,-3 0,3 C-2.2,-3 -2.2,-10 0,-17 Z" stroke="var(--accent)" stroke-width="1" />
+        <line x1="0" y1="-15" x2="0" y2="1" stroke="var(--ink)" stroke-width="0.9" opacity="0.7" />
+        <line x1="-5" y1="6" x2="5" y2="6" stroke="var(--accent)" stroke-width="1.2" />
+        <path d="M-2.5,18 L-10,15.5 L-2.5,21.5 M2.5,18 L10,15.5 L2.5,21.5" stroke="var(--gold)" stroke-width="1.05" />
+      </g>
+
+      <!-- Wczesnopiastowski medalion menniczy (Denar Princes Polonie — ptak książęcy i krzyż w otoku perełkowym) -->
+      <g transform="translate(274, 212) scale(0.76)" opacity="0.34">
+        <circle cx="0" cy="0" r="28" stroke="var(--gold)" stroke-width="1.05" stroke-dasharray="1.8 3.2" />
+        <circle cx="0" cy="0" r="23" stroke="var(--gold)" stroke-width="0.85" opacity="0.75" />
+        <path d="M-11,10 C-11,0 -5,-8 3,-8 C8,-8 11,-12 11,-16 C14,-15 16,-13 18,-13 C15,-11 14,-9 13,-6 C15,1 9,10 -2,12 L-13,16 Z" stroke="var(--accent)" stroke-width="1.25" stroke-linejoin="round" />
+        <path d="M-6,4 C-1,-1 5,-2 9,0" stroke="var(--gold)" stroke-width="1.1" />
+        <path d="M-16,-10 L-10,-10 M-13,-13 L-13,-7" stroke="var(--gold)" stroke-width="1.05" />
+      </g>
+
+      <!-- Główny podwójny łuk słowiański (architektoniczne lustro prawej wstęgi ormslinga) -->
+      <g opacity="0.46">
+        <path d="M 452,-16 C 218,28 66,92 66,166 C 66,248 214,298 544,300" stroke="var(--gold)" stroke-width="1.45" />
+        <path d="M 480,-10 C 266,40 110,100 110,166 C 110,228 248,262 540,264" stroke="var(--gold)" stroke-width="1.45" />
+        <!-- Subtelny ryt krawędziowy -->
+        <path d="M 447,-16 C 213,28 61,92 61,166 C 61,252 210,303 544,305" stroke="var(--accent)" stroke-width="0.7" opacity="0.65" />
+        <!-- Zakończenie łuku u dołu: stylizowany grzebień solarny (Ręce Boga) -->
+        <path d="M 540,264 L 540,300 M 540,270 L 558,270 M 540,276 L 562,276 M 540,282 L 566,282 M 540,288 L 562,288 M 540,294 L 558,294" stroke="var(--gold)" stroke-width="1.2" />
+        <circle cx="534" cy="282" r="2.2" fill="var(--accent)" />
+      </g>
+
+      <!-- Wczesnosłowiański / wczesnopiastowski fryz falisty i romby solarne biegnące wzdłuż łuku -->
+      <path
+        d="M 466.0,-12.0 Q 453.1,-19.7 444.5,-7.5 Q 435.9,4.8 423.0,-2.8 Q 410.0,-10.2 401.5,2.1 Q 393.2,14.6 380.1,7.3 Q 367.0,0.1 358.8,12.7 Q 350.8,25.3 337.5,18.3 Q 324.2,11.5 316.4,24.2 Q 308.7,37.1 295.3,30.5 Q 281.7,24.1 274.3,37.1 Q 267.1,50.2 253.4,44.1 Q 239.6,38.3 232.8,51.6 Q 226.2,65.0 212.3,59.7 Q 198.1,54.6 192.1,68.4 Q 186.5,82.2 172.3,77.9 Q 157.7,74.1 152.9,88.4 Q 149.0,102.7 134.4,100.2 Q 119.3,98.7 117.1,113.8 Q 116.5,128.4 101.9,129.7 Q 87.0,133.8 91.1,148.8 Q 98.5,160.8 88.2,170.4 Q 80.6,184.2 94.6,191.3 Q 108.7,193.9 108.4,208.3 Q 110.8,223.5 125.9,221.5 Q 140.2,218.0 145.4,231.8 Q 151.7,245.5 165.7,240.1 Q 179.3,234.0 186.7,246.9 Q 194.6,259.7 207.9,252.6 Q 220.8,245.2 229.4,257.4 Q 238.3,269.5 251.0,261.5 Q 263.5,253.3 272.7,265.1 Q 282.2,276.7 294.5,268.1 Q 306.6,259.4 316.3,270.7 Q 326.2,282.0 338.2,273.0 Q 350.1,263.8 360.1,274.9 Q 370.3,285.9 382.1,276.5 Q 393.7,267.1 404.0,277.9 Q 414.5,288.6 426.0,279.1 Q 437.4,269.4 448.0,280.0 Q 458.6,290.5 470.0,280.7 Q 481.2,270.9 492.0,281.3 Q 502.8,291.7 513.9,281.7 Q 525.1,271.7 535.9,282.0"
+        stroke="var(--accent)"
+        stroke-width="1.35"
+        opacity="0.54"
+      />
+      <g fill="var(--gold)" opacity="0.5">
+        <polygon points="389.9,-1.8 392.3,0.6 389.9,3.0 387.5,0.6" />
+        <polygon points="347.1,9.0 349.5,11.4 347.1,13.8 344.7,11.4" />
+        <polygon points="304.6,20.9 307.0,23.3 304.6,25.7 302.2,23.3" />
+        <polygon points="262.5,34.2 264.9,36.6 262.5,39.0 260.1,36.6" />
+        <polygon points="221.0,49.3 223.4,51.7 221.0,54.1 218.6,51.7" />
+        <polygon points="180.3,66.9 182.7,69.3 180.3,71.7 177.9,69.3" />
+        <polygon points="141.3,88.2 143.7,90.6 141.3,93.0 138.9,90.6" />
+        <polygon points="106.1,116.1 108.5,118.5 106.1,120.9 103.7,118.5" />
+        <polygon points="84.3,156.5 86.7,158.9 84.3,161.3 81.9,158.9" />
+        <polygon points="97.6,200.6 100.0,203.0 97.6,205.4 95.2,203.0" />
+        <polygon points="133.5,228.3 135.9,230.7 133.5,233.1 131.1,230.7" />
+        <polygon points="174.9,245.2 177.3,247.6 174.9,250.0 172.5,247.6" />
+        <polygon points="217.7,256.8 220.1,259.2 217.7,261.6 215.3,259.2" />
+        <polygon points="261.2,265.1 263.6,267.5 261.2,269.9 258.8,267.5" />
+        <polygon points="304.9,271.2 307.3,273.6 304.9,276.0 302.5,273.6" />
+        <polygon points="348.8,275.7 351.2,278.1 348.8,280.5 346.4,278.1" />
+        <polygon points="392.8,279.0 395.2,281.4 392.8,283.8 390.4,281.4" />
+        <polygon points="436.8,281.3 439.2,283.7 436.8,286.1 434.4,283.7" />
+        <polygon points="480.8,282.8 483.2,285.2 480.8,287.6 478.4,285.2" />
+      </g>
+
+      <!-- Słowiańska rozeta gromowita (Gwiazda Peruna) w osi łuku — dokładny odpowiednik krzyża z Upplandu po prawej -->
+      <g opacity="0.36">
+        <circle cx="182" cy="166" r="27" stroke="var(--gold)" stroke-width="0.9" stroke-dasharray="2 4" />
+        <circle cx="182" cy="166" r="24" stroke="var(--accent)" stroke-width="0.9" opacity="0.85" />
+        <path d="M182,166 A24,24 0 0 1 182.0,142.0 A24,24 0 0 1 182,166 Z" stroke="var(--gold)" stroke-width="1" />
+        <path d="M182,166 A24,24 0 0 1 202.8,154.0 A24,24 0 0 1 182,166 Z" stroke="var(--gold)" stroke-width="1" />
+        <path d="M182,166 A24,24 0 0 1 202.8,178.0 A24,24 0 0 1 182,166 Z" stroke="var(--gold)" stroke-width="1" />
+        <path d="M182,166 A24,24 0 0 1 182.0,190.0 A24,24 0 0 1 182,166 Z" stroke="var(--gold)" stroke-width="1" />
+        <path d="M182,166 A24,24 0 0 1 161.2,178.0 A24,24 0 0 1 182,166 Z" stroke="var(--gold)" stroke-width="1" />
+        <path d="M182,166 A24,24 0 0 1 161.2,154.0 A24,24 0 0 1 182,166 Z" stroke="var(--gold)" stroke-width="1" />
+        <circle cx="182" cy="166" r="2" fill="var(--accent)" />
+      </g>
+    </svg>
+
+    <!-- Warstwa 1b: Rysowana winieta nordyckiego kamienia runicznego po prawej (ormslinga + wyryte runy na łuku SVG) -->
+    <svg class="masthead-runestone-art" viewBox="0 0 1200 320" preserveAspectRatio="xMaxYMid slice" fill="none" aria-hidden="true">
+      <defs>
+        <path id="rune-ribbon-path" d="M 734,-12 C 958,34 1112,96 1112,166 C 1112,238 968,280 658,282" />
+      </defs>
+
+      <!-- Zarys monolitu / spękania kamienia po prawej -->
+      <path d="M 1030,-10 L 1062,54 L 1044,122 L 1078,195 L 1046,274 L 1072,330" stroke="var(--rule-strong)" stroke-width="0.9" opacity="0.34" />
+      <path d="M 880,22 L 916,58 L 902,94" stroke="var(--rule-strong)" stroke-width="0.7" opacity="0.28" />
+      <path d="M 1152,20 L 1176,105 L 1158,210 L 1184,310" stroke="var(--rule-strong)" stroke-width="0.8" opacity="0.28" />
+
+      <!-- Wtórna przeplatająca się wstęga w stylu Urnes (węzeł smoczy) -->
+      <g opacity="0.32">
+        <path d="M 968,-14 C 892,76 1044,128 962,210 C 912,260 1002,292 1094,328" stroke="var(--gold)" stroke-width="1.3" />
+        <path d="M 982,-14 C 908,76 1058,128 976,210 C 928,258 1018,288 1108,328" stroke="var(--gold)" stroke-width="0.95" />
+        <!-- Zawijas końcowy węża runicznego -->
+        <path d="M 906,120 C 874,98 844,126 864,154 C 882,178 920,164 912,138" stroke="var(--accent)" stroke-width="1.1" />
+        <path d="M 902,132 C 886,122 872,136 882,148" stroke="var(--gold)" stroke-width="0.85" />
+      </g>
+
+      <!-- Główna podwójna wstęga kamienia runicznego (ormslinga) -->
+      <g opacity="0.46">
+        <path d="M 748,-16 C 982,28 1134,92 1134,166 C 1134,248 986,298 656,300" stroke="var(--gold)" stroke-width="1.45" />
+        <path d="M 720,-10 C 934,40 1090,100 1090,166 C 1090,228 952,262 660,264" stroke="var(--gold)" stroke-width="1.45" />
+        <!-- Subtelne ryty krawędziowe -->
+        <path d="M 753,-16 C 987,28 1139,92 1139,166 C 1139,252 990,303 656,305" stroke="var(--accent)" stroke-width="0.7" opacity="0.65" />
+        <!-- Rysowana głowa smoka/węża zamykająca wstęgę u dołu -->
+        <path d="M 656,264 C 632,264 618,274 610,282 C 618,290 632,300 656,300" stroke="var(--gold)" stroke-width="1.3" />
+        <circle cx="634" cy="278" r="2.2" fill="var(--accent)" />
+        <path d="M 610,282 L 594,277 M 610,282 L 595,287" stroke="var(--accent)" stroke-width="0.9" />
+      </g>
+
+      <!-- Wyryte runy starszego futharku wzdłuż łuku wstęgi -->
+      <text class="ribbon-runes" fill="var(--accent)" opacity="0.58" font-size="18" letter-spacing="8">
+        <textPath href="#rune-ribbon-path" startOffset="4%">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ ᛬ ᛊ ᛈ ᛚ ᛟ ᛏ ᛃ</textPath>
+      </text>
+
+      <!-- Geometryczny krzyż/węzeł wyryty po prawej jak na kamieniach z Upplandu -->
+      <g transform="translate(1018, 166)" opacity="0.34">
+        <circle cx="0" cy="0" r="26" stroke="var(--gold)" stroke-width="0.9" stroke-dasharray="2 4" />
+        <path d="M-20,0 L20,0 M0,-20 L0,20" stroke="var(--gold)" stroke-width="1" />
+        <polygon points="0,-14 14,0 0,14 -14,0" stroke="var(--accent)" stroke-width="1" />
+      </g>
+    </svg>
+
+    <!-- Warstwa 2: Symetryczne cienkie kinetyczne linie splatające oba skrzydła (reagują na ruch kursora) -->
+    <svg class="masthead-threads" viewBox="0 0 1200 320" preserveAspectRatio="none" fill="none" aria-hidden="true">
+      <path id="thread-1" d="M-40,122 C320,76 880,256 1240,122" stroke="var(--gold)" stroke-width="1" opacity="0.38" />
+      <path id="thread-2" d="M-40,224 C320,276 880,96 1240,224" stroke="var(--accent)" stroke-width="1.15" opacity="0.46" />
+      <path id="thread-3" d="M-40,172 C400,148 800,196 1240,172" stroke="var(--ink)" stroke-width="0.6" opacity="0.16" />
+    </svg>
+
+    <div class="masthead-inner">
+      <!-- Górny, bezramkowy pasek nawigacji -->
+      <div class="masthead-bar">
+        <span class="masthead-edition">
+          <span class="edition-runes" title="Sploty (Futhark starszy)">ᛊᛈᛚᛟᛏᛃ</span>
+          <span class="edition-sep" aria-hidden="true">·</span>
+          <span id="masthead-year">Anno Domini MMXXVI · przed <span class="runic-term" title="Ragnarök">ᚱᚨᚷᚾᚨᚱᛟᚲ</span></span>
+        </span>
+
+        <div class="masthead-bar-right">
+          <nav class="masthead-nav" aria-label="Nawigacja główna">
+            <a href="#/" class="nav-item" data-route="home">Indeks</a>
+            <a href="#/watki" class="nav-item" data-route="threads">Wątki</a>
+            <a href="#/miscellanea" class="nav-item" data-route="miscellanea">Miscellanea</a>
+            <a href="#/o-mnie" class="nav-item" data-route="about">O mnie</a>
+          </nav>
+
+          <button type="button" id="theme-toggle" class="theme-pill" aria-label="Zmień motyw">
+            <span class="theme-label-dark">Pergamin</span>
+            <span class="theme-label-light">Inkaust</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scena główna: Astrolabium z cyklem 42 symboli (nordyckie, słowiańskie, wczesnopiastowskie, starożytne, Thelema i filozoficzno-religijne — zmiana co 360° lub po kliknięciu) -->
+      <div class="masthead-hero">
+        <div class="astrolabe-stage" title="Kliknij lub poczekaj pełny obrót o 360°, aby przejść do kolejnego symbolu">
+          <svg class="masthead-astrolabe" id="masthead-astrolabe" viewBox="0 0 180 180" width="170" height="170" fill="none" aria-hidden="true">
+            <defs>
+              <radialGradient id="astro-glow-grad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="var(--gold)" stop-opacity="0.72" />
+                <stop offset="48%" stop-color="var(--accent)" stop-opacity="0.34" />
+                <stop offset="100%" stop-color="var(--gold)" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+
+            <!-- Blask towarzyszący pojawianiu się kolejnego symbolu -->
+            <circle class="astro-aura" cx="90" cy="90" r="46" fill="url(#astro-glow-grad)" />
+            <circle class="astro-pulse-ring" cx="90" cy="90" r="38" stroke="var(--gold)" stroke-width="1.2" />
+
+            <!-- Zewnętrzny pierścień runiczny -->
+            <g class="astro-outer">
+              <circle cx="90" cy="90" r="82" stroke="var(--gold)" stroke-width="0.95" stroke-dasharray="2.5 5" opacity="0.78" />
+              <circle cx="90" cy="90" r="64" stroke="var(--rule-strong)" stroke-width="0.9" opacity="0.82" />
+              <text x="90" y="20" text-anchor="middle" fill="var(--gold)" font-size="11" font-family="'Noto Sans Runic', serif">ᚲ</text>
+              <text x="164" y="94" text-anchor="middle" fill="var(--accent)" font-size="11" font-family="'Noto Sans Runic', serif">ᚦ</text>
+              <text x="90" y="168" text-anchor="middle" fill="var(--gold)" font-size="11" font-family="'Noto Sans Runic', serif">ᛗ</text>
+              <text x="16" y="94" text-anchor="middle" fill="var(--ink-secondary)" font-size="11" font-family="'Noto Sans Runic', serif">ᚨ</text>
+            </g>
+
+            <!-- Wewnętrzny obracający się pierścień (pełny obrót 360° -> przejście w kolejny symbol) -->
+            <g class="astro-inner" id="astro-rotor">
+              <circle cx="90" cy="90" r="42" stroke="var(--gold)" stroke-width="1" opacity="0.86" />
+              <circle cx="90" cy="90" r="38" stroke="var(--accent)" stroke-width="0.65" opacity="0.45" />
+
+              <!-- 1. Pentagram -->
+              <g class="astro-symbol is-active" data-symbol-name="Pentagram">
+                <polygon points="90,52 112.34,120.74 53.86,78.26 126.14,78.26 67.66,120.74" stroke="var(--accent)" stroke-width="1.35" stroke-linejoin="miter" />
+                <circle cx="90" cy="90" r="2.2" fill="var(--gold)" />
+              </g>
+
+              <!-- 2. Thor: Mjölnir (Młot Thora) -->
+              <g class="astro-symbol" data-symbol-name="Mjölnir">
+                <circle cx="90" cy="60" r="3.5" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M86.5,63.5 L86.5,87 L62,92 L65,114 L90,119 L115,114 L118,92 L93.5,87 L93.5,63.5" stroke="var(--gold)" stroke-width="1.35" stroke-linejoin="miter" />
+                <!-- Rytowany motyw na obuchu młota -->
+                <path d="M90,94 L90,112 M80,103 L100,103" stroke="var(--accent)" stroke-width="1.1" />
+                <polygon points="90,98 95,103 90,108 85,103" stroke="var(--accent)" stroke-width="1" />
+              </g>
+
+              <!-- 3. Odyn: Valknut -->
+              <g class="astro-symbol" data-symbol-name="Valknut">
+                <polygon points="90,56 71,89 109,89" stroke="var(--gold)" stroke-width="1.3" stroke-linejoin="miter" />
+                <polygon points="80,73 61,106 99,106" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="miter" opacity="0.9" />
+                <polygon points="100,73 81,106 119,106" stroke="var(--accent)" stroke-width="1.3" stroke-linejoin="miter" />
+              </g>
+
+              <!-- 4. Odyn: Potrójny Róg Odyna (Trzy Rogi Miodu Poezji — kamień ze Snoldelev) -->
+              <g class="astro-symbol" data-symbol-name="Rogi Odyna">
+                <g transform="rotate(0 90 90)">
+                  <path d="M77,73 C77,58 98,55 103,68 C95,69 89,75 86,87 C82,84 77,80 77,73 Z" stroke="var(--gold)" stroke-width="1.2" />
+                </g>
+                <g transform="rotate(120 90 90)">
+                  <path d="M77,73 C77,58 98,55 103,68 C95,69 89,75 86,87 C82,84 77,80 77,73 Z" stroke="var(--accent)" stroke-width="1.2" />
+                </g>
+                <g transform="rotate(240 90 90)">
+                  <path d="M77,73 C77,58 98,55 103,68 C95,69 89,75 86,87 C82,84 77,80 77,73 Z" stroke="var(--ink)" stroke-width="1.15" opacity="0.88" />
+                </g>
+                <circle cx="90" cy="90" r="2.2" fill="var(--gold)" />
+              </g>
+
+              <!-- 5. Freyr: Runa Ingwaz (ᛜ — światło, płodność i pokój) -->
+              <g class="astro-symbol" data-symbol-name="Ingwaz">
+                <line x1="68" y1="60" x2="112" y2="104" stroke="var(--gold)" stroke-width="1.35" />
+                <line x1="112" y1="60" x2="68" y2="104" stroke="var(--gold)" stroke-width="1.35" />
+                <line x1="68" y1="76" x2="112" y2="120" stroke="var(--accent)" stroke-width="1.35" />
+                <line x1="112" y1="76" x2="68" y2="120" stroke="var(--accent)" stroke-width="1.35" />
+                <polygon points="90,74 106,90 90,106 74,90" stroke="var(--ink)" stroke-width="1" opacity="0.7" />
+              </g>
+
+              <!-- 6. Loki: Splot Dwóch Węży (węzeł Urnes — ogień i dwoistość) -->
+              <g class="astro-symbol" data-symbol-name="Splot Węży">
+                <path d="M76,62 C58,72 62,92 90,90 C118,88 122,108 104,118 C92,124 76,118 76,106" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round" />
+                <path d="M104,62 C122,72 118,92 90,90 C62,88 58,108 76,118 C88,124 104,118 104,106" stroke="var(--gold)" stroke-width="1.4" stroke-linecap="round" />
+                <circle cx="76" cy="62" r="2.4" fill="var(--accent)" />
+                <circle cx="104" cy="62" r="2.4" fill="var(--gold)" />
+              </g>
+
+              <!-- 7. Tyr: Runa Tiwaz (ᛏ — włócznia prawa i odwagi) -->
+              <g class="astro-symbol" data-symbol-name="Tiwaz">
+                <line x1="90" y1="56" x2="90" y2="124" stroke="var(--gold)" stroke-width="1.6" />
+                <polyline points="69,77 90,56 111,77" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="miter" />
+                <line x1="74" y1="100" x2="106" y2="100" stroke="var(--ink)" stroke-width="1" opacity="0.75" />
+                <circle cx="90" cy="100" r="2.5" fill="var(--accent)" />
+              </g>
+
+              <!-- 8. Yggdrasil (Drzewo Światów) -->
+              <g class="astro-symbol" data-symbol-name="Yggdrasil">
+                <line x1="90" y1="62" x2="90" y2="118" stroke="var(--gold)" stroke-width="1.5" />
+                <!-- Korona -->
+                <path d="M90,76 C82,66 72,64 64,68" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M90,76 C98,66 108,64 116,68" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M90,68 C84,60 79,57 74,58" stroke="var(--accent)" stroke-width="1.05" />
+                <path d="M90,68 C96,60 101,57 106,58" stroke="var(--accent)" stroke-width="1.05" />
+                <!-- Korzenie -->
+                <path d="M90,104 C82,114 72,116 64,112" stroke="var(--accent)" stroke-width="1.2" />
+                <path d="M90,104 C98,114 108,116 116,112" stroke="var(--accent)" stroke-width="1.2" />
+                <path d="M90,110 C85,118 80,122 74,121" stroke="var(--gold)" stroke-width="1.05" />
+                <path d="M90,110 C95,118 100,122 106,121" stroke="var(--gold)" stroke-width="1.05" />
+                <circle cx="90" cy="90" r="4" stroke="var(--ink)" stroke-width="1" opacity="0.8" />
+              </g>
+
+              <!-- 9. Ægishjálmur (Hełm Grozy — 8 trójzębów) -->
+              <g class="astro-symbol" data-symbol-name="Ægishjálmur">
+                <line x1="96" y1="90" x2="123" y2="90" stroke="var(--gold)" stroke-width="1.1" />
+                <polyline points="124,94.5 116,90 124,85.5" stroke="var(--accent)" stroke-width="1" />
+                <line x1="108" y1="93.2" x2="108" y2="86.8" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+                <line x1="94.2" y1="94.2" x2="113.3" y2="113.3" stroke="var(--gold)" stroke-width="1.1" />
+                <polyline points="110.9,117.2 108.4,108.4 117.2,110.9" stroke="var(--accent)" stroke-width="1" />
+                <line x1="100.5" y1="105" x2="105" y2="100.5" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+                <line x1="90" y1="96" x2="90" y2="123" stroke="var(--gold)" stroke-width="1.1" />
+                <polyline points="85.5,124 90,116 94.5,124" stroke="var(--accent)" stroke-width="1" />
+                <line x1="86.8" y1="108" x2="93.2" y2="108" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+                <line x1="85.8" y1="94.2" x2="66.7" y2="113.3" stroke="var(--gold)" stroke-width="1.1" />
+                <polyline points="62.8,110.9 71.6,108.4 69.1,117.2" stroke="var(--accent)" stroke-width="1" />
+                <line x1="75" y1="100.5" x2="79.5" y2="105" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+                <line x1="84" y1="90" x2="57" y2="90" stroke="var(--gold)" stroke-width="1.1" />
+                <polyline points="56,85.5 64,90 56,94.5" stroke="var(--accent)" stroke-width="1" />
+                <line x1="72" y1="86.8" x2="72" y2="93.2" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+                <line x1="85.8" y1="85.8" x2="66.7" y2="66.7" stroke="var(--gold)" stroke-width="1.1" />
+                <polyline points="69.1,62.8 71.6,71.6 62.8,69.1" stroke="var(--accent)" stroke-width="1" />
+                <line x1="79.5" y1="75" x2="75" y2="79.5" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+                <line x1="90" y1="84" x2="90" y2="57" stroke="var(--gold)" stroke-width="1.1" />
+                <polyline points="94.5,56 90,64 85.5,56" stroke="var(--accent)" stroke-width="1" />
+                <line x1="93.2" y1="72" x2="86.8" y2="72" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+                <line x1="94.2" y1="85.8" x2="113.3" y2="66.7" stroke="var(--gold)" stroke-width="1.1" />
+                <polyline points="117.2,69.1 108.4,71.6 110.9,62.8" stroke="var(--accent)" stroke-width="1" />
+                <line x1="105" y1="79.5" x2="100.5" y2="75" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+                <circle cx="90" cy="90" r="6" stroke="var(--accent)" stroke-width="1.1" />
+              </g>
+
+              <!-- 10. Nordycki: Runa Othala (ᛟ) -->
+              <g class="astro-symbol" data-symbol-name="Othala">
+                <polygon points="90,56 113,79 90,102 67,79" stroke="var(--gold)" stroke-width="1.35" stroke-linejoin="miter" />
+                <polygon points="90,66 103,79 90,92 77,79" stroke="var(--accent)" stroke-width="1" stroke-linejoin="miter" opacity="0.85" />
+                <line x1="90" y1="102" x2="71" y2="121" stroke="var(--accent)" stroke-width="1.35" />
+                <line x1="90" y1="102" x2="109" y2="121" stroke="var(--accent)" stroke-width="1.35" />
+              </g>
+
+              <!-- 11. Sumeryjski: Dingir (𒀭 — klinowa gwiazda niebios) -->
+              <g class="astro-symbol" data-symbol-name="Dingir">
+                <polygon points="87,56 93,56 90,63" fill="var(--gold)" />
+                <line x1="90" y1="62" x2="90" y2="124" stroke="var(--gold)" stroke-width="1.35" />
+                <polygon points="56,87 56,93 63,90" fill="var(--gold)" />
+                <line x1="62" y1="90" x2="124" y2="90" stroke="var(--gold)" stroke-width="1.35" />
+                <polygon points="65,69 69,65 72,72" fill="var(--accent)" />
+                <line x1="71" y1="71" x2="114" y2="114" stroke="var(--accent)" stroke-width="1.25" />
+                <polygon points="111,65 115,69 108,72" fill="var(--accent)" />
+                <line x1="109" y1="71" x2="66" y2="114" stroke="var(--accent)" stroke-width="1.25" />
+                <circle cx="90" cy="90" r="3" fill="var(--ink)" />
+              </g>
+
+              <!-- 12. Babiloński: Gwiazda Isztar -->
+              <g class="astro-symbol" data-symbol-name="Isztar">
+                <polygon points="90,56 95,78 114,66 102,85 124,90 102,95 114,114 95,102 90,124 85,102 66,114 78,95 56,90 78,85 66,66 85,78" stroke="var(--gold)" stroke-width="1.25" stroke-linejoin="miter" />
+                <circle cx="90" cy="90" r="8.5" stroke="var(--accent)" stroke-width="1.2" />
+                <circle cx="90" cy="90" r="2.6" fill="var(--accent)" />
+              </g>
+
+              <!-- 13. Akadyjski: Słońce Szamasza -->
+              <g class="astro-symbol" data-symbol-name="Szamasz">
+                <polygon points="90,55 97.8,82.2 125,90 97.8,97.8 90,125 82.2,97.8 55,90 82.2,82.2" stroke="var(--accent)" stroke-width="1.25" stroke-linejoin="miter" />
+                <path d="M98,82 Q103,73 107,74 Q110,70 114,66" stroke="var(--gold)" stroke-width="1.15" />
+                <path d="M98,98 Q107,103 106,107 Q110,110 114,114" stroke="var(--gold)" stroke-width="1.15" />
+                <path d="M82,98 Q77,107 73,106 Q70,110 66,114" stroke="var(--gold)" stroke-width="1.15" />
+                <path d="M82,82 Q73,77 74,73 Q70,70 66,66" stroke="var(--gold)" stroke-width="1.15" />
+                <circle cx="90" cy="90" r="9.5" fill="var(--bg)" stroke="var(--gold)" stroke-width="1.2" />
+                <circle cx="90" cy="90" r="3" fill="var(--accent)" />
+              </g>
+
+              <!-- 14. Egipski: Ankh -->
+              <g class="astro-symbol" data-symbol-name="Ankh">
+                <path d="M90,84 C78,76 78,56 90,56 C102,56 102,76 90,84 Z" stroke="var(--gold)" stroke-width="1.45" />
+                <line x1="69" y1="86" x2="111" y2="86" stroke="var(--accent)" stroke-width="1.5" />
+                <line x1="90" y1="84" x2="90" y2="124" stroke="var(--accent)" stroke-width="1.5" />
+                <circle cx="90" cy="69" r="2" fill="var(--accent)" />
+              </g>
+
+              <!-- 15. Egipski: Oko Horusa (Udjat) -->
+              <g class="astro-symbol" data-symbol-name="Oko Horusa">
+                <path d="M62,77 Q88,63 116,75" stroke="var(--gold)" stroke-width="1.35" />
+                <path d="M64,87 Q88,73 112,87 Q88,100 64,87 Z" stroke="var(--ink)" stroke-width="1.3" />
+                <circle cx="88" cy="87" r="5.5" stroke="var(--accent)" stroke-width="1.3" />
+                <circle cx="88" cy="87" r="2" fill="var(--accent)" />
+                <line x1="88" y1="97" x2="88" y2="115" stroke="var(--gold)" stroke-width="1.3" />
+                <path d="M97,95 C105,103 114,106 111,115 C109,120 102,118 103,113" stroke="var(--accent)" stroke-width="1.25" />
+              </g>
+
+              <!-- 16. Wczesnochrześcijański: Chi-Rho (☧) -->
+              <g class="astro-symbol" data-symbol-name="Chi-Rho">
+                <line x1="90" y1="56" x2="90" y2="124" stroke="var(--gold)" stroke-width="1.5" />
+                <path d="M90,56 C106,56 106,77 90,77" stroke="var(--gold)" stroke-width="1.5" />
+                <line x1="68" y1="74" x2="112" y2="112" stroke="var(--accent)" stroke-width="1.35" />
+                <line x1="112" y1="74" x2="68" y2="112" stroke="var(--accent)" stroke-width="1.35" />
+                <text x="64" y="96" text-anchor="middle" fill="var(--ink-secondary)" font-size="9" font-family="'EB Garamond', serif">Α</text>
+                <text x="116" y="96" text-anchor="middle" fill="var(--ink-secondary)" font-size="9" font-family="'EB Garamond', serif">Ω</text>
+              </g>
+
+              <!-- 17. Wczesnochrześcijański: Ichthys -->
+              <g class="astro-symbol" data-symbol-name="Ichthys">
+                <path d="M58,90 Q86,62 120,102" stroke="var(--gold)" stroke-width="1.45" />
+                <path d="M58,90 Q86,118 120,78" stroke="var(--accent)" stroke-width="1.45" />
+                <circle cx="74" cy="89" r="2.2" fill="var(--ink)" />
+              </g>
+
+              <!-- 18. Thelema: Heksagram Jednokreślny (z pięciopłatkową różą) -->
+              <g class="astro-symbol" data-symbol-name="Heksagram Jednokreślny">
+                <polygon points="90,56 119.4,107 60.6,73 90,124 119.4,73 60.6,107" stroke="var(--gold)" stroke-width="1.35" stroke-linejoin="miter" />
+                <!-- Pięciopłatkowa róża pośrodku -->
+                <circle cx="90" cy="85.2" r="2.7" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="94.6" cy="88.5" r="2.7" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="92.8" cy="93.9" r="2.7" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="87.2" cy="93.9" r="2.7" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="85.4" cy="88.5" r="2.7" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="90" cy="90" r="2" fill="var(--gold)" />
+              </g>
+
+              <!-- 19. Thelema / A∴A∴: Gwiazda Babalon (Heptagram {7/3}) -->
+              <g class="astro-symbol" data-symbol-name="Gwiazda Babalon">
+                <polygon points="90,56 104.8,120.6 63.4,68.8 123.1,97.6 56.9,97.6 116.6,68.8 75.2,120.6" stroke="var(--accent)" stroke-width="1.25" stroke-linejoin="miter" />
+                <circle cx="90" cy="90" r="9.5" stroke="var(--gold)" stroke-width="1" opacity="0.85" />
+                <circle cx="90" cy="90" r="2.4" fill="var(--gold)" />
+              </g>
+
+              <!-- 20. Thelema: Hadit (Skrzydlaty Dysk Słoneczny) -->
+              <g class="astro-symbol" data-symbol-name="Hadit">
+                <!-- Skrzydła -->
+                <path d="M81,88 C74,78 65,75 56,77 C63,83 70,87 80,91" stroke="var(--gold)" stroke-width="1.25" />
+                <path d="M80,91 C71,89 63,91 58,96 C66,97 74,95 82,94" stroke="var(--gold)" stroke-width="1.05" opacity="0.82" />
+                <path d="M99,88 C106,78 115,75 124,77 C117,83 110,87 100,91" stroke="var(--gold)" stroke-width="1.25" />
+                <path d="M100,91 C109,89 117,91 122,96 C114,97 106,95 98,94" stroke="var(--gold)" stroke-width="1.05" opacity="0.82" />
+                <!-- Dwa ureusze -->
+                <path d="M84,96 C78,101 76,108 82,110 C85,111 87,108 86,105" stroke="var(--accent)" stroke-width="1.15" />
+                <path d="M96,96 C102,101 104,108 98,110 C95,111 93,108 94,105" stroke="var(--accent)" stroke-width="1.15" />
+                <!-- Dysk centralny -->
+                <circle cx="90" cy="90" r="9" stroke="var(--accent)" stroke-width="1.4" />
+                <circle cx="90" cy="90" r="2.6" fill="var(--gold)" />
+              </g>
+
+              <!-- 21. Różokrzyż / Hermetyzm / Thelema: Krzyż Różany -->
+              <g class="astro-symbol" data-symbol-name="Krzyż Różany">
+                <path d="M86,58 L94,58 L94,86 L122,86 L122,94 L94,94 L94,122 L86,122 L86,94 L58,94 L58,86 L86,86 Z" stroke="var(--gold)" stroke-width="1.25" stroke-linejoin="miter" />
+                <circle cx="90" cy="90" r="10.5" fill="var(--bg-soft)" stroke="var(--accent)" stroke-width="1.15" />
+                <circle cx="90" cy="85.2" r="3" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="94.6" cy="88.5" r="3" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="92.8" cy="93.9" r="3" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="87.2" cy="93.9" r="3" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="85.4" cy="88.5" r="3" stroke="var(--accent)" stroke-width="1" />
+                <circle cx="90" cy="90" r="2.1" fill="var(--gold)" />
+              </g>
+
+              <!-- 22. Hermetyzm / John Dee: Monada Hieroglificzna -->
+              <g class="astro-symbol" data-symbol-name="Monada Hieroglificzna">
+                <!-- Półksiężyc u szczytu -->
+                <path d="M80,58 A10,10 0 0 0 100,58" stroke="var(--gold)" stroke-width="1.4" />
+                <!-- Słońce z punktem -->
+                <circle cx="90" cy="76" r="10" stroke="var(--gold)" stroke-width="1.4" />
+                <circle cx="90" cy="76" r="2.2" fill="var(--accent)" />
+                <!-- Krzyż żywiołów -->
+                <line x1="90" y1="86" x2="90" y2="114" stroke="var(--accent)" stroke-width="1.4" />
+                <line x1="76" y1="98" x2="104" y2="98" stroke="var(--accent)" stroke-width="1.4" />
+                <!-- Znak Barana (ogień) u podstawy -->
+                <path d="M90,114 C86,108 77,110 78,118 C79,122 83,123 85,121" stroke="var(--gold)" stroke-width="1.3" />
+                <path d="M90,114 C94,108 103,110 102,118 C101,122 97,123 95,121" stroke="var(--gold)" stroke-width="1.3" />
+              </g>
+
+              <!-- 23. Kabała / Hermetyzm: Drzewo Życia (10 Sefirot) -->
+              <g class="astro-symbol" data-symbol-name="Drzewo Życia">
+                <!-- Ścieżki i filary -->
+                <g stroke="var(--gold)" stroke-width="0.9" opacity="0.72">
+                  <line x1="90" y1="60" x2="90" y2="121" />
+                  <line x1="73" y1="69" x2="73" y2="101" />
+                  <line x1="107" y1="69" x2="107" y2="101" />
+                  <line x1="90" y1="60" x2="73" y2="69" />
+                  <line x1="90" y1="60" x2="107" y2="69" />
+                  <line x1="73" y1="69" x2="107" y2="69" />
+                  <line x1="73" y1="69" x2="90" y2="90" />
+                  <line x1="107" y1="69" x2="90" y2="90" />
+                  <line x1="73" y1="83" x2="107" y2="83" />
+                  <line x1="73" y1="83" x2="90" y2="90" />
+                  <line x1="107" y1="83" x2="90" y2="90" />
+                  <line x1="90" y1="90" x2="73" y2="101" />
+                  <line x1="90" y1="90" x2="107" y2="101" />
+                  <line x1="73" y1="101" x2="107" y2="101" />
+                  <line x1="73" y1="101" x2="90" y2="109" />
+                  <line x1="107" y1="101" x2="90" y2="109" />
+                  <line x1="73" y1="101" x2="90" y2="121" />
+                  <line x1="107" y1="101" x2="90" y2="121" />
+                </g>
+                <!-- 10 Sefirot -->
+                <g fill="var(--bg-soft)" stroke="var(--accent)" stroke-width="1.2">
+                  <circle cx="90" cy="60" r="3" />
+                  <circle cx="73" cy="69" r="3" />
+                  <circle cx="107" cy="69" r="3" />
+                  <circle cx="73" cy="83" r="3" />
+                  <circle cx="107" cy="83" r="3" />
+                  <circle cx="90" cy="90" r="3.4" stroke="var(--gold)" />
+                  <circle cx="73" cy="101" r="3" />
+                  <circle cx="107" cy="101" r="3" />
+                  <circle cx="90" cy="109" r="3" />
+                  <circle cx="90" cy="121" r="3" />
+                </g>
+              </g>
+
+              <!-- 24. Alchemia: Kamień Filozoficzny (Kwadratura koła) -->
+              <g class="astro-symbol" data-symbol-name="Kamień Filozoficzny">
+                <circle cx="90" cy="90" r="31.5" stroke="var(--gold)" stroke-width="1.25" />
+                <polygon points="90,58.5 117.3,105.8 62.7,105.8" stroke="var(--accent)" stroke-width="1.3" stroke-linejoin="miter" />
+                <rect x="77.2" y="80.3" width="25.5" height="25.5" stroke="var(--ink)" stroke-width="1.1" opacity="0.88" />
+                <circle cx="90" cy="93.1" r="12.7" stroke="var(--gold)" stroke-width="1.2" />
+                <circle cx="90" cy="93.1" r="2.2" fill="var(--accent)" />
+              </g>
+
+              <!-- 25. Gnostycyzm / Alchemia: Uroboros -->
+              <g class="astro-symbol" data-symbol-name="Uroboros">
+                <circle cx="90" cy="90" r="28" stroke="var(--gold)" stroke-width="1.35" stroke-dasharray="152 24" stroke-dashoffset="-10" />
+                <circle cx="90" cy="90" r="22" stroke="var(--gold)" stroke-width="1.15" stroke-dasharray="118 22" stroke-dashoffset="-8" />
+                <!-- Głowa węża pożerająca ogon u góry -->
+                <path d="M84,60 C89,56 97,57 101,62 C97,67 90,68 85,65 Z" stroke="var(--accent)" stroke-width="1.25" fill="var(--bg-soft)" />
+                <circle cx="94" cy="61.5" r="1.4" fill="var(--accent)" />
+                <!-- Zwężający się ogon w paszczy -->
+                <path d="M74,64 C78,62 82,62 86,62.5" stroke="var(--accent)" stroke-width="1.2" />
+                <!-- Wewnętrzny znak nieskończoności / cyklu -->
+                <circle cx="90" cy="90" r="3.2" stroke="var(--accent)" stroke-width="1.1" />
+              </g>
+
+              <!-- 26. Hermetyzm / Filozofia grecka: Kaduceusz -->
+              <g class="astro-symbol" data-symbol-name="Kaduceusz">
+                <!-- Laska Hermesa -->
+                <line x1="90" y1="62" x2="90" y2="123" stroke="var(--gold)" stroke-width="1.4" />
+                <circle cx="90" cy="60" r="3" stroke="var(--gold)" stroke-width="1.2" />
+                <!-- Skrzydła u szczytu -->
+                <path d="M87,64 C79,59 71,59 64,63 C71,67 79,68 87,67" stroke="var(--gold)" stroke-width="1.15" />
+                <path d="M93,64 C101,59 109,59 116,63 C109,67 101,68 93,67" stroke="var(--gold)" stroke-width="1.15" />
+                <!-- Dwa splecione węże -->
+                <path d="M83,70 C74,77 106,87 90,96 C75,104 102,112 90,119" stroke="var(--accent)" stroke-width="1.3" />
+                <path d="M97,70 C106,77 74,87 90,96 C105,104 78,112 90,119" stroke="var(--ink)" stroke-width="1.15" opacity="0.88" />
+                <circle cx="83" cy="70" r="1.7" fill="var(--accent)" />
+                <circle cx="97" cy="70" r="1.7" fill="var(--gold)" />
+              </g>
+
+              <!-- 27. Pitagoreizm: Tetraktys (1+2+3+4 = 10) -->
+              <g class="astro-symbol" data-symbol-name="Tetraktys">
+                <polygon points="90,57 120,110 60,110" stroke="var(--gold)" stroke-width="1.1" opacity="0.68" stroke-linejoin="miter" />
+                <g fill="var(--accent)">
+                  <circle cx="90" cy="68" r="2.6" fill="var(--gold)" />
+                  <circle cx="83" cy="80" r="2.6" />
+                  <circle cx="97" cy="80" r="2.6" />
+                  <circle cx="76" cy="92" r="2.6" fill="var(--gold)" />
+                  <circle cx="90" cy="92" r="2.6" fill="var(--gold)" />
+                  <circle cx="104" cy="92" r="2.6" fill="var(--gold)" />
+                  <circle cx="69" cy="104" r="2.6" />
+                  <circle cx="83" cy="104" r="2.6" />
+                  <circle cx="97" cy="104" r="2.6" />
+                  <circle cx="111" cy="104" r="2.6" />
+                </g>
+              </g>
+
+              <!-- 28. Taoizm: Taijitu (Yin-Yang) -->
+              <g class="astro-symbol" data-symbol-name="Taijitu">
+                <path d="M90,60 A30,30 0 0 1 90,120 A15,15 0 0 1 90,90 A15,15 0 0 0 90,60 Z" fill="var(--gold)" fill-opacity="0.2" stroke="var(--gold)" stroke-width="1.3" />
+                <circle cx="90" cy="90" r="30" stroke="var(--gold)" stroke-width="1.35" />
+                <circle cx="90" cy="75" r="4" stroke="var(--accent)" stroke-width="1.25" />
+                <circle cx="90" cy="105" r="4" fill="var(--accent)" />
+              </g>
+
+              <!-- 29. Buddyzm: Dharmaczakra (Koło Dharmy) -->
+              <g class="astro-symbol" data-symbol-name="Dharmaczakra">
+                <circle cx="90" cy="90" r="28" stroke="var(--gold)" stroke-width="1.35" />
+                <circle cx="90" cy="90" r="24" stroke="var(--accent)" stroke-width="0.9" opacity="0.8" />
+                <circle cx="90" cy="90" r="7.5" stroke="var(--gold)" stroke-width="1.25" />
+                <circle cx="90" cy="90" r="2.4" fill="var(--accent)" />
+                <!-- 8 szprych Ośmiorakiej Ścieżki -->
+                <g stroke="var(--gold)" stroke-width="1.2">
+                  <line x1="90" y1="82.5" x2="90" y2="57" />
+                  <line x1="95.3" y1="84.7" x2="113.3" y2="66.7" />
+                  <line x1="97.5" y1="90" x2="123" y2="90" />
+                  <line x1="95.3" y1="95.3" x2="113.3" y2="113.3" />
+                  <line x1="90" y1="97.5" x2="90" y2="123" />
+                  <line x1="84.7" y1="95.3" x2="66.7" y2="113.3" />
+                  <line x1="82.5" y1="90" x2="57" y2="90" />
+                  <line x1="84.7" y1="84.7" x2="66.7" y2="66.7" />
+                </g>
+              </g>
+
+              <!-- 30. Hinduizm / Śiwaizm: Trishula -->
+              <g class="astro-symbol" data-symbol-name="Trishula">
+                <line x1="90" y1="56" x2="90" y2="124" stroke="var(--gold)" stroke-width="1.5" />
+                <polyline points="86.5,63 90,56 93.5,63" stroke="var(--accent)" stroke-width="1.25" />
+                <path d="M68,66 C66,82 74,90 90,90 C106,90 114,82 112,66" stroke="var(--gold)" stroke-width="1.4" />
+                <polyline points="64.5,72 68,65 72,71.5" stroke="var(--accent)" stroke-width="1.2" />
+                <polyline points="108,71.5 112,65 115.5,72" stroke="var(--accent)" stroke-width="1.2" />
+                <!-- Półksiężyc i bębenek damaru -->
+                <path d="M81,96 A9,9 0 0 0 99,96" stroke="var(--accent)" stroke-width="1.2" />
+                <polygon points="84,106 96,106 90,111" stroke="var(--ink)" stroke-width="0.95" opacity="0.8" />
+                <polygon points="84,116 96,116 90,111" stroke="var(--ink)" stroke-width="0.95" opacity="0.8" />
+              </g>
+
+              <!-- 31. Zoroastryzm: Farawahar (skrzydlaty pierścień ducha) -->
+              <g class="astro-symbol" data-symbol-name="Farawahar">
+                <!-- Potrójne skrzydła (Dobra Myśl, Słowo, Czyn) -->
+                <path d="M82,86 L57,80 L61,86 L81,90" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M81,90 L60,89 L64,95 L82,94" stroke="var(--gold)" stroke-width="1.1" opacity="0.85" />
+                <path d="M98,86 L123,80 L119,86 L99,90" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M99,90 L120,89 L116,95 L98,94" stroke="var(--gold)" stroke-width="1.1" opacity="0.85" />
+                <!-- Centralny pierścień wieczności -->
+                <circle cx="90" cy="90" r="8.5" stroke="var(--accent)" stroke-width="1.4" />
+                <!-- Górna postać / płomień i dolne wstęgi -->
+                <path d="M90,81.5 L90,69 M86,74 L94,74" stroke="var(--gold)" stroke-width="1.3" />
+                <circle cx="90" cy="66" r="2.6" stroke="var(--accent)" stroke-width="1.15" />
+                <path d="M86,98 L81,114 L90,110 L99,114 L94,98" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M83,96 C74,102 72,110 77,113" stroke="var(--accent)" stroke-width="1.1" />
+                <path d="M97,96 C106,102 108,110 103,113" stroke="var(--accent)" stroke-width="1.1" />
+              </g>
+
+              <!-- 32. Filozofia Chaosu: Gwiazda Chaosu (8 strzał) -->
+              <g class="astro-symbol" data-symbol-name="Gwiazda Chaosu">
+                <circle cx="90" cy="90" r="6" stroke="var(--accent)" stroke-width="1.2" />
+                <g stroke="var(--gold)" stroke-width="1.2">
+                  <line x1="90" y1="84" x2="90" y2="58" />
+                  <line x1="94.2" y1="85.8" x2="112.6" y2="67.4" />
+                  <line x1="96" y1="90" x2="122" y2="90" />
+                  <line x1="94.2" y1="94.2" x2="112.6" y2="112.6" />
+                  <line x1="90" y1="96" x2="90" y2="122" />
+                  <line x1="85.8" y1="94.2" x2="67.4" y2="112.6" />
+                  <line x1="84" y1="90" x2="58" y2="90" />
+                  <line x1="85.8" y1="85.8" x2="67.4" y2="67.4" />
+                </g>
+                <g stroke="var(--accent)" stroke-width="1.15" stroke-linejoin="miter">
+                  <polyline points="87,63.2 90,58 93,63.2" />
+                  <polyline points="106.8,68.9 112.6,67.4 111.1,73.2" />
+                  <polyline points="116.8,87 122,90 116.8,93" />
+                  <polyline points="111.1,106.8 112.6,112.6 106.8,111.1" />
+                  <polyline points="93,116.8 90,122 87,116.8" />
+                  <polyline points="73.2,111.1 67.4,112.6 68.9,106.8" />
+                  <polyline points="63.2,93 58,90 63.2,87" />
+                  <polyline points="68.9,73.2 67.4,67.4 73.2,68.9" />
+                </g>
+              </g>
+
+              <!-- 33. Wczesne średniowiecze polskie: Włócznia św. Maurycego (Zjazd Gnieźnieński 1000 r.) -->
+              <g class="astro-symbol" data-symbol-name="Włócznia św. Maurycego">
+                <!-- Liściasty grot z ażurowym wycięciem -->
+                <path d="M90,55 C95,68 99,82 95,98 L93,104 L93,124 L87,124 L87,104 L85,98 C81,82 85,68 90,55 Z" stroke="var(--gold)" stroke-width="1.35" stroke-linejoin="miter" />
+                <!-- Ażurowy prześwit z relikwią gwoździa i złote opaski -->
+                <path d="M90,71 C92.5,79 92.5,87 90,94 C87.5,87 87.5,79 90,71 Z" stroke="var(--accent)" stroke-width="1.1" />
+                <line x1="90" y1="74" x2="90" y2="91" stroke="var(--ink)" stroke-width="1.15" />
+                <line x1="84.5" y1="98" x2="95.5" y2="98" stroke="var(--accent)" stroke-width="1.4" />
+                <line x1="86" y1="104" x2="94" y2="104" stroke="var(--accent)" stroke-width="1.2" />
+                <!-- Skrzydełka tulei -->
+                <path d="M87,111 L77,108 L87,115 M93,111 L103,108 L93,115" stroke="var(--gold)" stroke-width="1.2" />
+              </g>
+
+              <!-- 34. Państwo Piastów: Denar Princes Polonie (Bolesław Chrobry, ok. 1000 r.) -->
+              <g class="astro-symbol" data-symbol-name="Princes Polonie">
+                <!-- Otok perełkowy wczesnopiastowskiej monety -->
+                <circle cx="90" cy="90" r="30" stroke="var(--gold)" stroke-width="1.1" stroke-dasharray="1.8 3.2" />
+                <circle cx="90" cy="90" r="24.5" stroke="var(--gold)" stroke-width="0.95" opacity="0.78" />
+                <!-- Stylizowany ptak książęcy z denara -->
+                <path d="M77,101 C77,90 83,81 92,81 C97,81 101,77 101,73 C104,74 106,76 108,76 C105,78 104,80 103,83 C105,91 99,101 87,103 L75,107 Z" stroke="var(--accent)" stroke-width="1.3" stroke-linejoin="round" />
+                <!-- Skrzydło i czub -->
+                <path d="M83,95 C88,89 94,88 99,90" stroke="var(--gold)" stroke-width="1.15" />
+                <path d="M98,74 L95,69 M101,73 L100,68" stroke="var(--gold)" stroke-width="1.05" />
+                <circle cx="101.5" cy="76.5" r="1.2" fill="var(--ink)" />
+                <!-- Podstawa / krzyżyk menniczy -->
+                <path d="M87,103 L87,111 M93,102 L95,111 M71,79 L77,79 M74,76 L74,82" stroke="var(--gold)" stroke-width="1.1" />
+              </g>
+
+              <!-- 35. Państwo Piastów: Orzeł Piastowski (wczesnośredniowieczny) -->
+              <g class="astro-symbol" data-symbol-name="Orzeł Piastowski">
+                <!-- Głowa zwrócona w lewo i szyja -->
+                <path d="M90,62 C86,62 84,65 86,69 L88,76 L92,76 L93,67 C94,64 92,62 90,62 Z" stroke="var(--gold)" stroke-width="1.25" />
+                <path d="M85,65 L79,66 L85,68" stroke="var(--accent)" stroke-width="1.15" />
+                <!-- Rozpostarte skrzydła -->
+                <path d="M88,76 C77,70 66,68 59,74 C63,80 65,86 67,92 C74,89 80,86 86,86" stroke="var(--gold)" stroke-width="1.3" />
+                <path d="M92,76 C103,70 114,68 121,74 C117,80 115,86 113,92 C106,89 100,86 94,86" stroke="var(--gold)" stroke-width="1.3" />
+                <!-- Przepaska piastowska na piersi -->
+                <path d="M67,80 C77,85 103,85 113,80" stroke="var(--accent)" stroke-width="1.35" />
+                <circle cx="67" cy="80" r="1.6" fill="var(--accent)" />
+                <circle cx="113" cy="80" r="1.6" fill="var(--accent)" />
+                <!-- Korpus, szpony i ogon -->
+                <path d="M86,86 L85,102 L90,119 L95,102 L94,86" stroke="var(--gold)" stroke-width="1.25" />
+                <path d="M85,99 L75,107 M75,107 L71,106 M75,107 L75,112" stroke="var(--accent)" stroke-width="1.15" />
+                <path d="M95,99 L105,107 M105,107 L109,106 M105,107 L105,112" stroke="var(--accent)" stroke-width="1.15" />
+              </g>
+
+              <!-- 36. Państwo Piastów: Szczerbiec (koronacyjny miecz piastowski) -->
+              <g class="astro-symbol" data-symbol-name="Szczerbiec">
+                <!-- Okrągła głowica -->
+                <circle cx="90" cy="60" r="4.5" stroke="var(--gold)" stroke-width="1.3" />
+                <circle cx="90" cy="60" r="1.4" fill="var(--accent)" />
+                <!-- Rękojeść -->
+                <line x1="90" y1="64.5" x2="90" y2="75" stroke="var(--gold)" stroke-width="1.8" />
+                <!-- Charakterystyczny łukowaty jelec -->
+                <path d="M72,72 Q90,81 108,72" stroke="var(--accent)" stroke-width="1.55" stroke-linecap="round" />
+                <!-- Głownia z otwartą szczeliną (szczerbą) -->
+                <path d="M86.8,77 L86.8,113 L90,124 L93.2,113 L93.2,77" stroke="var(--gold)" stroke-width="1.3" stroke-linejoin="miter" />
+                <rect x="88.5" y="81.5" width="3" height="9" stroke="var(--accent)" stroke-width="1" />
+                <line x1="90" y1="93" x2="90" y2="117" stroke="var(--ink)" stroke-width="0.85" opacity="0.75" />
+              </g>
+
+              <!-- 37. Religia słowiańska: Ręce Boga (popielnica z Białej) -->
+              <g class="astro-symbol" data-symbol-name="Ręce Boga">
+                <!-- Centralny krzyż z grzebieniastymi zakończeniami ramion -->
+                <line x1="90" y1="66" x2="90" y2="114" stroke="var(--gold)" stroke-width="1.35" />
+                <line x1="66" y1="90" x2="114" y2="90" stroke="var(--gold)" stroke-width="1.35" />
+                <!-- Grzebienie / palce na czterech końcach -->
+                <g stroke="var(--gold)" stroke-width="1.15">
+                  <line x1="80" y1="66" x2="100" y2="66" />
+                  <line x1="80" y1="66" x2="80" y2="59" />
+                  <line x1="85" y1="66" x2="85" y2="59" />
+                  <line x1="90" y1="66" x2="90" y2="58" />
+                  <line x1="95" y1="66" x2="95" y2="59" />
+                  <line x1="100" y1="66" x2="100" y2="59" />
+
+                  <line x1="80" y1="114" x2="100" y2="114" />
+                  <line x1="80" y1="114" x2="80" y2="121" />
+                  <line x1="85" y1="114" x2="85" y2="121" />
+                  <line x1="90" y1="114" x2="90" y2="122" />
+                  <line x1="95" y1="114" x2="95" y2="121" />
+                  <line x1="100" y1="114" x2="100" y2="121" />
+
+                  <line x1="66" y1="80" x2="66" y2="100" />
+                  <line x1="66" y1="80" x2="59" y2="80" />
+                  <line x1="66" y1="85" x2="59" y2="85" />
+                  <line x1="66" y1="90" x2="58" y2="90" />
+                  <line x1="66" y1="95" x2="59" y2="95" />
+                  <line x1="66" y1="100" x2="59" y2="100" />
+
+                  <line x1="114" y1="80" x2="114" y2="100" />
+                  <line x1="114" y1="80" x2="121" y2="80" />
+                  <line x1="114" y1="85" x2="121" y2="85" />
+                  <line x1="114" y1="90" x2="122" y2="90" />
+                  <line x1="114" y1="95" x2="121" y2="95" />
+                  <line x1="114" y1="100" x2="121" y2="100" />
+                </g>
+                <!-- Cztery ukośne znaki solarne między ramionami -->
+                <g stroke="var(--accent)" stroke-width="1.05">
+                  <path d="M74,74 L81,81 M74,74 L74,78 M74,74 L78,74" />
+                  <path d="M106,74 L99,81 M106,74 L106,78 M106,74 L102,74" />
+                  <path d="M74,106 L81,99 M74,106 L74,102 M74,106 L78,106" />
+                  <path d="M106,106 L99,99 M106,106 L106,102 M106,106 L102,106" />
+                </g>
+                <circle cx="90" cy="90" r="2.2" fill="var(--accent)" />
+              </g>
+
+              <!-- 38. Religia słowiańska: Gwiazda Peruna (rozeta sześciopłatkowa / gromowity) -->
+              <g class="astro-symbol" data-symbol-name="Gwiazda Peruna">
+                <circle cx="90" cy="90" r="28" stroke="var(--accent)" stroke-width="1.25" />
+                <circle cx="90" cy="90" r="31.5" stroke="var(--gold)" stroke-width="0.75" opacity="0.65" />
+                <path d="M90,90 A28,28 0 0 1 90,62 A28,28 0 0 1 90,90 Z" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M90,90 A28,28 0 0 1 114.2,76 A28,28 0 0 1 90,90 Z" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M90,90 A28,28 0 0 1 114.2,104 A28,28 0 0 1 90,90 Z" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M90,90 A28,28 0 0 1 90,118 A28,28 0 0 1 90,90 Z" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M90,90 A28,28 0 0 1 65.8,104 A28,28 0 0 1 90,90 Z" stroke="var(--gold)" stroke-width="1.2" />
+                <path d="M90,90 A28,28 0 0 1 65.8,76 A28,28 0 0 1 90,90 Z" stroke="var(--gold)" stroke-width="1.2" />
+                <circle cx="90" cy="90" r="2.5" fill="var(--accent)" />
+              </g>
+
+              <!-- 39. Religia słowiańska: Kołowrót (ośmioramienne koło słoneczne Swaroga) -->
+              <g class="astro-symbol" data-symbol-name="Kołowrót">
+                <circle cx="90" cy="90" r="6.5" stroke="var(--accent)" stroke-width="1.3" />
+                <circle cx="90" cy="90" r="2.2" fill="var(--gold)" />
+                <polyline points="90,83.5 90,64 103.6,62.1" stroke="var(--gold)" stroke-width="1.3" stroke-linejoin="miter" />
+                <polyline points="94.6,85.4 108.4,71.6 119.3,79.9" stroke="var(--accent)" stroke-width="1.2" stroke-linejoin="miter" />
+                <polyline points="96.5,90 116,90 117.9,103.6" stroke="var(--gold)" stroke-width="1.3" stroke-linejoin="miter" />
+                <polyline points="94.6,94.6 108.4,108.4 100.1,119.3" stroke="var(--accent)" stroke-width="1.2" stroke-linejoin="miter" />
+                <polyline points="90,96.5 90,116 76.4,117.9" stroke="var(--gold)" stroke-width="1.3" stroke-linejoin="miter" />
+                <polyline points="85.4,94.6 71.6,108.4 60.7,100.1" stroke="var(--accent)" stroke-width="1.2" stroke-linejoin="miter" />
+                <polyline points="83.5,90 64,90 62.1,76.4" stroke="var(--gold)" stroke-width="1.3" stroke-linejoin="miter" />
+                <polyline points="85.4,85.4 71.6,71.6 79.9,60.7" stroke="var(--accent)" stroke-width="1.2" stroke-linejoin="miter" />
+              </g>
+
+              <!-- 40. Religia słowiańska: Weles (rogaty znak pana Nawii i mądrości) -->
+              <g class="astro-symbol" data-symbol-name="Weles">
+                <!-- Rogi tura u szczytu -->
+                <path d="M64,59 C68,72 78,76 90,76 C102,76 112,72 116,59" stroke="var(--accent)" stroke-width="1.45" />
+                <!-- Odwrócone „A” / trójkąt Nawii z poprzeczką -->
+                <polyline points="69,71 90,122 111,71" stroke="var(--gold)" stroke-width="1.45" stroke-linejoin="miter" />
+                <line x1="72" y1="86" x2="108" y2="86" stroke="var(--accent)" stroke-width="1.35" />
+                <circle cx="90" cy="96" r="2.6" fill="var(--gold)" />
+              </g>
+
+              <!-- 41. Religia słowiańska: Światowid (posąg ze Zbrucza — trzy strefy kosmosu) -->
+              <g class="astro-symbol" data-symbol-name="Światowid">
+                <!-- Wspólna czapka / nakrycie głowy -->
+                <path d="M77,64 C77,57 103,57 103,64 Z" stroke="var(--accent)" stroke-width="1.3" />
+                <!-- Słup czterotwarzowy (Prawia, Jawia, Nawia) -->
+                <rect x="79" y="64" width="22" height="58" stroke="var(--gold)" stroke-width="1.3" />
+                <!-- Podział na trzy poziomy świata -->
+                <line x1="79" y1="85" x2="101" y2="85" stroke="var(--accent)" stroke-width="1.15" />
+                <line x1="79" y1="104" x2="101" y2="104" stroke="var(--accent)" stroke-width="1.15" />
+                <!-- Strefa górna: oblicze i róg obfitości -->
+                <path d="M84,71 L88,71 M92,71 L96,71 M90,71 L90,77" stroke="var(--ink)" stroke-width="1" opacity="0.88" />
+                <path d="M84,81 C89,80 94,78 96,75" stroke="var(--accent)" stroke-width="1.1" />
+                <!-- Strefa środkowa: korowód ludzi -->
+                <line x1="83" y1="94" x2="97" y2="94" stroke="var(--gold)" stroke-width="1.05" />
+                <circle cx="85" cy="90" r="1.4" fill="var(--gold)" />
+                <circle cx="90" cy="90" r="1.4" fill="var(--gold)" />
+                <circle cx="95" cy="90" r="1.4" fill="var(--gold)" />
+                <!-- Strefa dolna: klęczący bóg podtrzymujący świat -->
+                <path d="M84,108 L90,113 L96,108 M90,113 L90,119" stroke="var(--accent)" stroke-width="1.15" />
+              </g>
+
+              <!-- 42. Religia słowiańska: Łunnica (wczesnośredniowieczna zawieszka księżycowa) -->
+              <g class="astro-symbol" data-symbol-name="Łunnica">
+                <!-- Uszko zawieszki -->
+                <circle cx="90" cy="65" r="4" stroke="var(--gold)" stroke-width="1.25" />
+                <!-- Półksiężyc rogami w dół -->
+                <path d="M90,69 C71,69 59,83 61,105 C69,92 78,86 90,86 C102,86 111,92 119,105 C121,83 109,69 90,69 Z" stroke="var(--gold)" stroke-width="1.4" stroke-linejoin="round" />
+                <!-- Wewnętrzny trójkąt / granulacja filigranowa -->
+                <polygon points="90,73 95,82 85,82" stroke="var(--accent)" stroke-width="1.1" />
+                <circle cx="75" cy="83" r="1.8" fill="var(--accent)" />
+                <circle cx="105" cy="83" r="1.8" fill="var(--accent)" />
+                <circle cx="66" cy="94" r="1.6" fill="var(--gold)" />
+                <circle cx="114" cy="94" r="1.6" fill="var(--gold)" />
+                <line x1="90" y1="86" x2="90" y2="104" stroke="var(--accent)" stroke-width="1.15" />
+                <circle cx="90" cy="107" r="2.2" stroke="var(--accent)" stroke-width="1.1" />
+              </g>
+            </g>
+          </svg>
+          <span class="astro-caption" id="astro-symbol-label" aria-live="polite">Pentagram</span>
+        </div>
+
+        <div class="masthead-title-block">
+          <a href="#/" class="brand-link" aria-label="Sploty — strona główna">
+            <span class="brand-name" id="site-name">Sploty</span>
+          </a>
+          <div class="brand-cut-rule" aria-hidden="true"></div>
+          <span class="brand-tagline" id="site-tagline">Technologia · Muzyka · Filozofia · Język · Północ · Piastowie</span>
+          <button
+            type="button"
+            class="ragnarok-clock"
+            id="ragnarok-countdown"
+            title="Według Eddy (Gylfaginning 51) Ragnarök (ᚱᚨᚷᚾᚨᚱᛟᚲ) poprzedza Fimbulvetr — trzy nieprzerwane zimy bez lata, liczone od najbliższego przesilenia zimowego (Jól)."
+          >
+            <span class="ragnarok-label">Do <span class="runic-term" title="Ragnarök">ᚱᚨᚷᚾᚨᚱᛟᚲ</span></span>
+            <span class="ragnarok-sep" aria-hidden="true">·</span>
+            <span class="ragnarok-time" id="ragnarok-timer">III zimy Fimbulvetr</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-shell">
+    <!-- Główna treść -->
+    <main id="app" class="main" tabindex="-1">
+      <noscript>
+        <p>Włącz JavaScript, aby wyświetlić teksty z dziennika <strong>Sploty</strong>.</p>
+      </noscript>
+    </main>
+
+    <!-- Cichy, książkowy kolofon -->
+    <footer class="colophon">
+      <div class="colophon-right" id="footer-links"></div>
+      <div class="colophon-left" id="footer-copy">© Anno Domini MMXXVI · przed <span class="runic-term" title="Ragnarök">ᚱᚨᚷᚾᚨᚱᛟᚲ</span> · Sploty · ᛖᚲᚹᛁᛗᚨᚾᚦᛟᚱᚾ</div>
+      <div class="colophon-ragnarok" id="ragnarok-footer" aria-live="off"></div>
+    </footer>
+  </div>
+
+  <!-- Subtelne powiadomienie -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="data/posts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
