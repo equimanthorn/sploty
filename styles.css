@@ -1565,34 +1565,32 @@ body.is-about-page .masthead::after {
   gap: 10px;
 }
 
-/* Subtelny pasek informacji o ciasteczkach i pamięci lokalnej */
-.cookie-banner {
+/* Okno informacji o ciasteczkach i pamięci lokalnej */
+.sploty-notice {
   position: fixed;
   right: 22px;
   bottom: 22px;
-  width: min(400px, calc(100vw - 32px));
+  width: min(410px, calc(100vw - 32px));
   padding: 18px 20px;
   background: var(--bg-soft);
   border: 1px solid var(--gold-faint);
+  border-top: 2px solid var(--gold);
   border-radius: 2px;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.36);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.45);
   color: var(--ink);
-  z-index: 180;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 240ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 220;
+  animation: gentleReveal 260ms ease both;
 }
 
-[data-theme="light"] .cookie-banner {
-  box-shadow: 0 10px 28px rgba(23, 30, 41, 0.14);
+.sploty-notice[hidden] {
+  display: none;
 }
 
-.cookie-banner.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+[data-theme="light"] .sploty-notice {
+  box-shadow: 0 12px 32px rgba(23, 30, 41, 0.18);
 }
 
-.cookie-banner-head {
+.sploty-notice-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -1600,16 +1598,16 @@ body.is-about-page .masthead::after {
   margin-bottom: 8px;
 }
 
-.cookie-banner-title {
+.sploty-notice-title {
   font-family: var(--font-display);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--gold);
 }
 
-.cookie-banner-link {
+.sploty-notice-link {
   font-family: var(--font-display);
   font-size: 0.64rem;
   font-weight: 600;
@@ -1620,26 +1618,26 @@ body.is-about-page .masthead::after {
   transition: color var(--transition), border-color var(--transition);
 }
 
-.cookie-banner-link:hover {
+.sploty-notice-link:hover {
   color: var(--accent);
   border-bottom-color: var(--accent);
 }
 
-.cookie-banner-text {
+.sploty-notice-text {
   margin: 0 0 14px;
-  font-size: 0.94rem;
+  font-size: 0.96rem;
   line-height: 1.54;
   color: var(--ink-secondary);
 }
 
-.cookie-banner-actions {
+.sploty-notice-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.cookie-btn {
-  padding: 6px 13px;
+.sploty-notice-btn {
+  padding: 7px 14px;
   border: 1px solid var(--rule-strong);
   border-radius: 2px;
   background: transparent;
@@ -1653,18 +1651,18 @@ body.is-about-page .masthead::after {
   transition: border-color var(--transition), color var(--transition), background-color var(--transition);
 }
 
-.cookie-btn:hover {
+.sploty-notice-btn:hover {
   border-color: var(--accent);
   color: var(--ink);
 }
 
-.cookie-btn-primary {
-  border-color: var(--gold-faint);
+.sploty-notice-btn-primary {
+  border-color: var(--gold);
   background: var(--bg);
   color: var(--ink);
 }
 
-.cookie-btn-primary:hover {
+.sploty-notice-btn-primary:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -1809,7 +1807,7 @@ body.is-about-page .masthead::after {
     text-align: left;
   }
 
-  .cookie-banner {
+  .sploty-notice {
     right: 16px;
     left: 16px;
     bottom: 16px;

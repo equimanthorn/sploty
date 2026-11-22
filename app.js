@@ -331,26 +331,18 @@
     });
   }
 
-  const cookieBannerEl = document.getElementById('cookie-banner');
-  const cookieAcceptEl = document.getElementById('cookie-accept-btn');
-  const cookieSessionEl = document.getElementById('cookie-session-btn');
+  const noticeBannerEl = document.getElementById('sploty-notice');
+  const noticeAcceptEl = document.getElementById('notice-accept-btn');
+  const noticeSessionEl = document.getElementById('notice-session-btn');
 
-  function openCookieBanner() {
-    if (!cookieBannerEl) return;
-    cookieBannerEl.hidden = false;
-    requestAnimationFrame(() => {
-      cookieBannerEl.classList.add('is-visible');
-    });
+  function openPrivacyNotice() {
+    if (!noticeBannerEl) return;
+    noticeBannerEl.hidden = false;
   }
 
-  function closeCookieBanner() {
-    if (!cookieBannerEl) return;
-    cookieBannerEl.classList.remove('is-visible');
-    setTimeout(() => {
-      if (!cookieBannerEl.classList.contains('is-visible')) {
-        cookieBannerEl.hidden = true;
-      }
-    }, 260);
+  function closePrivacyNotice() {
+    if (!noticeBannerEl) return;
+    noticeBannerEl.hidden = true;
   }
 
   function refreshPrivacyStatusIfVisible() {
@@ -360,32 +352,32 @@
     }
   }
 
-  function initCookieBanner() {
-    if (!cookieBannerEl) return;
+  function initPrivacyNotice() {
+    if (!noticeBannerEl) return;
 
-    if (cookieAcceptEl) {
-      cookieAcceptEl.addEventListener('click', () => {
+    if (noticeAcceptEl) {
+      noticeAcceptEl.addEventListener('click', () => {
         try {
           sessionStorage.removeItem(SESSION_ONLY_KEY);
           localStorage.setItem(PRIVACY_KEY, 'accepted');
         } catch {
           /* ignore */
         }
-        closeCookieBanner();
+        closePrivacyNotice();
         refreshPrivacyStatusIfVisible();
         showToast('Zapisano ustawienia pamięci lokalnej');
       });
     }
 
-    if (cookieSessionEl) {
-      cookieSessionEl.addEventListener('click', () => {
+    if (noticeSessionEl) {
+      noticeSessionEl.addEventListener('click', () => {
         clearStoredPrefs();
         try {
           sessionStorage.setItem(SESSION_ONLY_KEY, '1');
         } catch {
           /* ignore */
         }
-        closeCookieBanner();
+        closePrivacyNotice();
         refreshPrivacyStatusIfVisible();
         showToast('Włączono tryb sesyjny — bez trwałego zapisu');
       });
@@ -401,7 +393,7 @@
     }
 
     if (!decided) {
-      openCookieBanner();
+      openPrivacyNotice();
     }
   }
 
@@ -548,7 +540,7 @@
   initKineticThreads();
   initAstrolabeMorph();
   initRagnarokClock();
-  initCookieBanner();
+  initPrivacyNotice();
 
   let isReadingArticle = false;
 
@@ -609,11 +601,11 @@
             return `<a href="${escapeHtml(href)}"${ext}>${escapeHtml(link.label)}</a>`;
           })
           .join('') +
-        `<button type="button" class="colophon-link-btn" id="open-cookie-settings-btn">Cookies</button>`;
+        `<button type="button" class="colophon-link-btn" id="open-notice-settings-btn">Cookies</button>`;
 
-      const openCookieBtn = document.getElementById('open-cookie-settings-btn');
-      if (openCookieBtn) {
-        openCookieBtn.addEventListener('click', openCookieBanner);
+      const openNoticeBtn = document.getElementById('open-notice-settings-btn');
+      if (openNoticeBtn) {
+        openNoticeBtn.addEventListener('click', openPrivacyNotice);
       }
     }
   }
@@ -1195,8 +1187,8 @@
             <strong>Bieżący tryb:</strong> <span id="privacy-status-text">${escapeHtml(getPrivacyStatusText())}</span>
           </p>
           <div class="privacy-actions">
-            <button type="button" id="privacy-reopen-banner" class="cookie-btn cookie-btn-primary">Zmień ustawienia cookies</button>
-            <button type="button" id="privacy-clear-storage" class="cookie-btn">Wyczyść zapisane preferencje</button>
+            <button type="button" id="privacy-reopen-banner" class="sploty-notice-btn sploty-notice-btn-primary">Zmień ustawienia cookies</button>
+            <button type="button" id="privacy-clear-storage" class="sploty-notice-btn">Wyczyść zapisane preferencje</button>
           </div>
         </section>
       </article>
@@ -1204,7 +1196,7 @@
 
     const reopenBtn = document.getElementById('privacy-reopen-banner');
     if (reopenBtn) {
-      reopenBtn.addEventListener('click', openCookieBanner);
+      reopenBtn.addEventListener('click', openPrivacyNotice);
     }
 
     const clearBtn = document.getElementById('privacy-clear-storage');
