@@ -316,6 +316,9 @@ a {
 }
 
 .theme-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 4px 12px;
   border: 1px solid var(--gold-faint);
   border-radius: 2px;
@@ -327,12 +330,24 @@ a {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
+  flex-shrink: 0;
   transition: border-color var(--transition), color var(--transition), background-color var(--transition);
 }
 
 .theme-pill:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.theme-label-dark,
+.theme-label-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-icon {
+  display: none;
 }
 
 [data-theme="light"] .theme-label-dark,
@@ -1547,7 +1562,41 @@ body.is-about-page .masthead::after {
   }
 
   .masthead-bar {
+    gap: 12px 14px;
     margin-bottom: 26px;
+  }
+
+  .masthead-bar-right {
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .masthead-nav {
+    flex-wrap: nowrap;
+    gap: 14px;
+  }
+
+  .nav-item {
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    white-space: nowrap;
+  }
+
+  .theme-pill {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    color: var(--gold);
+  }
+
+  .theme-text {
+    display: none;
+  }
+
+  .theme-icon {
+    display: block;
   }
 
   .masthead-hero {
@@ -1569,10 +1618,6 @@ body.is-about-page .masthead::after {
   .astro-caption {
     left: 0;
     transform: none;
-  }
-
-  .masthead-nav {
-    gap: 10px 16px;
   }
 
   .main {
@@ -1616,5 +1661,21 @@ body.is-about-page .masthead::after {
   .pager-link.next {
     grid-column: 1;
     text-align: left;
+  }
+}
+
+@media (max-width: 390px) {
+  .masthead-nav {
+    gap: 10px;
+  }
+
+  .nav-item {
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+  }
+
+  .theme-pill {
+    width: 30px;
+    height: 30px;
   }
 }
