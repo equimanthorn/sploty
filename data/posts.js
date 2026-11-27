@@ -31,6 +31,22 @@ window.SITE_CONFIG = {
     { label: 'GitHub', url: 'https://github.com/' },
     { label: 'Kontakt', url: 'mailto:kontakt@example.com' }
   ],
+  now: {
+    updated: '2026-11-27',
+    listening: {
+      title: 'Bathory — Blood Fire Death / Hammerheart',
+      note: 'Surowy epos Północy i wczesne zalążki viking metalu.',
+      url: 'https://www.youtube.com/results?search_query=Bathory+Hammerheart'
+    },
+    reading: {
+      title: 'Przemysław Urbańczyk — Mieszko Pierwszy Tajemniczy',
+      note: 'Krytyczne spojrzenie na narodziny państwa Piastów i źródła z X wieku.'
+    },
+    researching: {
+      title: 'Dendrochronologia grodów wielkopolskich i kontakty z Wolinem',
+      note: 'Związki rzemiosła i uzbrojenia z Ostrowa Lednickiego ze światem skandynawskim.'
+    }
+  },
   miscellanea: {
     title: 'Miscellanea',
     lead: 'Rzeczy pomieszane, drobne znaleziska, odsłuchy, wypisy z kronik i lektur oraz glosy na marginesie.',
@@ -109,6 +125,11 @@ window.BLOG_POSTS = [
     category: 'Piastowie',
     excerpt:
       'Jak w ciągu dwóch pokoleń na nizinie wielkopolskiej wyrosła sprawna machina państwowa: dendrochronologia, wały hakowe, drużyna książęca i północne sploty.',
+    soundtrack: {
+      artist: 'Bathory',
+      title: 'Hammerheart (1990)',
+      url: 'https://www.youtube.com/results?search_query=Bathory+Hammerheart'
+    },
     content: `
 Kiedy patrzymy na mapę Europy połowy X wieku, tempo, w jakim uformowało się władztwo pierwszych Piastów, wciąż budzi zdumienie historyków i archeologów. W ciągu zaledwie kilkudziesięciu lat dawne, rozproszone osadnictwo plemienne w Wielkopolsce zostało zastąpione spójną siecią potężnych ośrodków centralnych: **Gniezna, Poznania, Ostrowa Lednickiego, Giecza i Grzybowa**.
 
@@ -129,24 +150,6 @@ Symbolem wczesnopiastowskiej myśli technicznej stała się **konstrukcja hakowa
 Relacja kupca z Tortosy, **Ibrahima ibn Jakuba** (ok. 965/966), ukazuje państwo Mieszka I jako organizm zaskakująco uporządkowany: książę pobiera podatki w odważnikach handlowych, utrzymuje stałą, liczną drużynę zbrojnych i zaopatruje ją w konie, broń oraz odzież.
 
 Jednocześnie wczesne polskie średniowiecze nie powstawało w izolacji. Na Ostrowie Lednickim, w Gieczu czy nad dolną Odrą w okolicach Wolina krzyżowały się wpływy cesarstwa ottońskiego, Czech i **świata skandynawskiego** — widoczne w typach uzbrojenia, srebrnych skarbach z dirhamami i dynastycznych sojuszach, z małżeństwem **Świętosławy** (córki Mieszka I) na czele.
-
-
----
-
-{
-  slug: 'moj-wpis',
-  title: 'Tytuł wpisu',
-  date: '2026-11-27',
-  category: 'Piastowie',
-  excerpt: 'Krótki opis...',
-  content: `Treść artykułu...`,
-  galleryTitle: 'Galeria · Ostrów Lednicki',
-  gallery: [
-    { src: 'images/lednica-1.jpg', caption: 'Relikty palatium i kaplicy' },
-    { src: 'images/lednica-2.jpg', caption: 'Zarys wczesnopiastowskich wałów' },
-    { src: 'images/lednica-3.jpg', caption: 'Widok na jezioro Lednica' }
-  ]
-}
 
 ---
 
@@ -175,6 +178,11 @@ Zjazd Gnieźnieński w roku 1000, wręczenie Bolesławowi Chrobremu kopii **Wł�
     category: 'Muzyka',
     excerpt:
       'Dlaczego najbardziej surowe, przesterowane nagrania black metalowe potrafią działać na słuchacza jak medytacja, a nie jak hałas.',
+    soundtrack: {
+      artist: 'Mgła',
+      title: 'Exercises in Futility (2015)',
+      url: 'https://no-solace.bandcamp.com/album/exercises-in-futility-lp-2015'
+    },
     content: `
 Na pierwszy rzut ucha klasyczny black metal wydaje się całkowitym zaprzeczeniem ciszy. Tremolo gitarowe, jednostajny szum talerzy i surowa produkcja tworzą gęstą, nieprzepuszczalną ścianę dźwięku.
 
@@ -202,6 +210,11 @@ Dobry album z obu tych światów wymaga tego samego, czego wymaga trudny esej fi
     category: 'Filozofia',
     excerpt:
       'Między precyzją traktatu a wieloznacznością potocznego zdania kryje się przestrzeń, z której biorą się najciekawsze pytania.',
+    soundtrack: {
+      artist: 'Deathspell Omega',
+      title: 'Paracletus (2010)',
+      url: 'https://deathspellomega.bandcamp.com/album/paracletus'
+    },
     content: `
 Od czasów wczesnego Wittgensteina kusi nas wizja języka doskonale przezroczystego — takiego, w którym każde zdanie odpowiada jasno określonemu stanowi rzeczy, a nieporozumienia znikają wraz z definicją pojęć.
 
@@ -324,5 +337,156 @@ window.MISCELLANEA = [
     title: 'Narzędzia, które nie krzyczą',
     text: 'Najlepsze narzędzia tekstowe znikają w chwili, gdy zaczynasz pisać. Im mniej przycisków walczy o wzrok na ekranie, tym dłużej utrzymuje się ciągłość myśli.',
     source: 'Zapiski warsztatowe'
+  }
+];
+
+/**
+ * Słownik glos (dymków z objaśnieniami) — automatycznie podświetla pierwsze
+ * wystąpienie pojęcia w treści artykułów. W tekście Markdown można też użyć
+ * ręcznego zapisu: {{pojęcie|własne objaśnienie}}.
+ */
+window.GLOSSARY = {
+  'konstrukcja hakowa':
+    'Wczesnopiastowska technika budowy wałów obronnych z pni dębowych o naturalnych hakach gałęzi, spinających kolejne warstwy skrzyń przed rozsunięciem.',
+  'Dagome iudex':
+    'Najstarszy zachowany dokument dotyczący państwa Piastów (ok. 991 r.) — regest aktu oddania „państwa gnieźnieńskiego” pod opiekę Stolicy Apostolskiej.',
+  'Włóczni św. Maurycego':
+    'Kopia cesarskiej włóczni wręczona Bolesławowi Chrobremu przez Ottona III na Zjeździe Gnieźnieńskim w 1000 r. — najstarsze polskie insygnium władzy.',
+  'Princes Polonie':
+    'Legenda z najstarszego srebrnego denara Bolesława Chrobrego (ok. 1000 r.) — jedno z pierwszych materialnych świadectw nazwy Polonia.',
+  'palatia':
+    'Wczesnośredniowieczne kamienne rezydencje książęce (m.in. na Ostrowie Lednickim, w Poznaniu i Gieczu), łączone zazwyczaj z kaplicą.',
+  'Fimbulvetr':
+    'W mitologii nordyckiej (Gylfaginning 51) „Wielka Zima” — trzy następujące po sobie zimy bez lata, zwiastujące nadejście Ragnarök.',
+  'Urðr':
+    'Jedna z trzech Norn w mitologii nordyckiej, uosabiająca to, co się już stało (przeznaczenie i splot losu u korzeni Yggdrasila).',
+  'Tremolo':
+    'Technika bardzo szybkiego kostkowania pojedynczych dźwięków lub interwałów na gitarze, tworząca w black metalu jednorodną, hipnotyczną ścianę brzmienia.',
+  'silva rerum':
+    'Staropolski „las rzeczy” — domowa księga szlachecka łącząca zapiski historyczne, cytaty, mowy i notatki codzienne.'
+};
+
+/**
+ * Biblioteka i Płytoteka (#/biblioteka) — polecane książki, płyty i źródła historyczne.
+ */
+window.LIBRARY_ITEMS = [
+  {
+    kind: 'Książki',
+    author: 'Przemysław Urbańczyk',
+    title: 'Mieszko Pierwszy Tajemniczy',
+    year: '2012',
+    note: 'Trzeźwa, oparta na archeologii i dendrochronologii rekonstrukcja początków władztwa Piastów bez szkolnych mitów.'
+  },
+  {
+    kind: 'Źródła',
+    author: 'Gall Anonim',
+    title: 'Kronika polska (Cronicae et gesta ducum sive principum Polonorum)',
+    year: 'ok. 1113',
+    note: 'Fundamentalny tekst dla wyobraźni politycznej wczesnego polskiego średniowiecza — czytany jako literatura i manifest dworski.'
+  },
+  {
+    kind: 'Źródła',
+    author: 'Snorri Sturluson',
+    title: 'Edda prozaiczna (Gylfaginning)',
+    year: 'ok. 1220',
+    note: 'Najpełniejszy wykład kosmologii nordyckiej — od stworzenia świata po Fimbulvetr, Gjallarhorn i Ragnarök.'
+  },
+  {
+    kind: 'Książki',
+    author: 'Ludwig Wittgenstein',
+    title: 'Tractatus Logico-Philosophicus',
+    year: '1921',
+    note: 'Krótka, ascetyczna konstrukcja z numerowanych zdań o granicach języka, logiki i tego, co wymyka się opisowi.'
+  },
+  {
+    kind: 'Płyty',
+    author: 'Bathory',
+    title: 'Hammerheart',
+    year: '1990',
+    note: 'Monumentalny zwrot Quorthona ku surowemu eposowi Północy — chropowata produkcja, chóry i ciężar kamienia.'
+  },
+  {
+    kind: 'Płyty',
+    author: 'Mgła',
+    title: 'Exercises in Futility',
+    year: '2015',
+    note: 'Niezwykle zdyscyplinowany, chłodny black metal, w którym perkusja i powtarzalne riffy budują niemal filozoficzną przestrzeń.'
+  },
+  {
+    kind: 'Płyty',
+    author: 'Ulcerate',
+    title: 'Stare Into Death and Be Still',
+    year: '2020',
+    note: 'Architektura dysonansowego death metalu — gęsta polifonia i napięcie zamiast pustej prędkości.'
+  },
+  {
+    kind: 'Książki',
+    author: 'Jerzy Strzelczyk',
+    title: 'Bolesław Chrobry',
+    year: '1999',
+    note: 'Klasyczna, zdyscyplinowana biografia pierwszego króla — świetny kontekst dla Zjazdu Gnieźnieńskiego i dyplomacji roku 1000.'
+  }
+];
+
+/**
+ * Oś czasu: Wczesne Państwo Piastów i Świat Północy (#/kronika).
+ */
+window.CHRONICLE_EVENTS = [
+  {
+    year: '793',
+    realm: 'Północ',
+    title: 'Najazd na Lindisfarne',
+    text: 'Symboliczny początek epoki wikingów — skandynawskie szlaki morskie i rzeczne zaczynają przekształcać Europę Północną i basen Bałtyku.'
+  },
+  {
+    year: 'ok. 940',
+    realm: 'Piastowie',
+    title: 'Wielka rozbudowa grodów wielkopolskich',
+    text: 'Dendrochronologia dębowych wałów w Gnieźnie, Poznaniu, Gieczu i na Ostrowie Lednickim pokazuje nagłą, skoordynowaną budowę sieci ośrodków władzy.',
+    postSlug: 'architektura-wladzy-grody-waly-panstwo-piastow'
+  },
+  {
+    year: '965/966',
+    realm: 'Piastowie',
+    title: 'Relacja Ibrahima ibn Jakuba o kraju Mieszka',
+    text: 'Kupiec z Tortosy opisuje rozległe władztwo Mieszka I, podatki w odważnikach handlowych oraz liczną, utrzymywaną przez księcia drużynę zbrojnych.',
+    postSlug: 'architektura-wladzy-grody-waly-panstwo-piastow'
+  },
+  {
+    year: '966',
+    realm: 'Piastowie',
+    title: 'Chrzest Mieszka I',
+    text: 'Wejście młodego władztwa w łaciński krąg cywilizacji europejskiej, dyplomacji, pisma i kamiennej architektury przedromańskiej.'
+  },
+  {
+    year: 'ok. 980–990',
+    realm: 'Sploty',
+    title: 'Świętosława (Sygryda) i sojusze bałtyckie',
+    text: 'Małżeństwo córki Mieszka I z Erykiem Zwycięskim, a później ze Swenem Widłobrodym splata losy Piastów z tronami Szwecji, Danii i Anglii.'
+  },
+  {
+    year: 'ok. 991',
+    realm: 'Piastowie',
+    title: 'Regest „Dagome iudex”',
+    text: 'Pierwszy opis granic państwa gnieźnieńskiego (Civitas Schinesghe) od Bałtyku po Kraków, Prusy i Odrę.'
+  },
+  {
+    year: '1000',
+    realm: 'Piastowie',
+    title: 'Zjazd Gnieźnieński i Włócznia św. Maurycego',
+    text: 'Pielgrzymka cesarza Ottona III do grobu św. Wojciecha, ustanowienie metropolii gnieźnieńskiej i wybicie denarów z napisem PRINCES POLONIE.',
+    postSlug: 'architektura-wladzy-grody-waly-panstwo-piastow'
+  },
+  {
+    year: '1000',
+    realm: 'Północ',
+    title: 'Bitwa pod Svold i chrystianizacja Islandii',
+    text: 'W tym samym roku, gdy rozkwita Gniezno, na islandzkim Althingu zapada decyzja o przyjęciu chrześcijaństwa przy zachowaniu dawnej tradycji poetyckiej.'
+  },
+  {
+    year: '1025',
+    realm: 'Piastowie',
+    title: 'Koronacja Bolesława Chrobrego',
+    text: 'Zwieńczenie dwóch pokoleń budowy państwa — pierwsze polskie królestwo u progu epoki romańskiej.'
   }
 ];

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Sploty — Technologia · Muzyka · Filozofia · Język · Północ · Piastowie</title>
+    <link>./</link>
+    <description>Minimalistyczny dziennik o technologii, muzyce death i black metalowej, filozofii, języku, kulturze północy oraz państwie Piastów i wczesnym polskim średniowieczu.</description>
+    <language>pl</language>
+    <lastBuildDate>Fri, 27 Nov 2026 21:58:00 +0100</lastBuildDate>
+
+    <item>
+      <title>Architektura władzy — grody, dębowe wały i narodziny państwa Piastów</title>
+      <link>./#/wpis/architektura-wladzy-grody-waly-panstwo-piastow</link>
+      <guid isPermaLink="false">sploty-architektura-wladzy-grody-waly-panstwo-piastow</guid>
+      <pubDate>Sun, 22 Nov 2026 12:00:00 +0100</pubDate>
+      <category>Piastowie</category>
+      <description>Jak w ciągu dwóch pokoleń na nizinie wielkopolskiej wyrosła sprawna machina państwowa: dendrochronologia, wały hakowe, drużyna książęca i północne sploty.</description>
+    </item>
+
+    <item>
+      <title>Cisza pod ścianą dźwięku — o przestrzeni w black metalu</title>
+      <link>./#/wpis/cisza-pod-sciana-dzwieku-black-metal</link>
+      <guid isPermaLink="false">sploty-cisza-pod-sciana-dzwieku-black-metal</guid>
+      <pubDate>Sat, 21 Nov 2026 12:00:00 +0100</pubDate>
+      <category>Muzyka</category>
+      <description>Dlaczego najbardziej surowe, przesterowane nagrania black metalowe potrafią działać na słuchacza jak medytacja, a nie jak hałas.</description>
+    </item>
+
+    <item>
+      <title>Granice opisu — czego język formalny nie potrafi domknąć</title>
+      <link>./#/wpis/granice-opisu-i-urok-niejasnosci</link>
+      <guid isPermaLink="false">sploty-granice-opisu-i-urok-niejasnosci</guid>
+      <pubDate>Mon, 16 Nov 2026 12:00:00 +0100</pubDate>
+      <category>Filozofia</category>
+      <description>Między precyzją traktatu a wieloznacznością potocznego zdania kryje się przestrzeń, z której biorą się najciekawsze pytania.</description>
+    </item>
+
+    <item>
+      <title>Słowa, które myślą za nas — metafory w języku technologii</title>
+      <link>./#/wpis/slowa-ktore-mysla-za-nas</link>
+      <guid isPermaLink="false">sploty-slowa-ktore-mysla-za-nas</guid>
+      <pubDate>Tue, 10 Nov 2026 12:00:00 +0100</pubDate>
+      <category>Język</category>
+      <description>„Chmura”, „strumień”, „pamięć”, „halucynacja” — niewinne zapożyczenia, które po cichu narzucają sposób rozumienia maszyn.</description>
+    </item>
+
+    <item>
+      <title>Architektura prostoty — dlaczego zwykły tekst przetrwa kolejne dekady</title>
+      <link>./#/wpis/architektura-prostoty-i-trwalosc-tekstu</link>
+      <guid isPermaLink="false">sploty-architektura-prostoty-i-trwalosc-tekstu</guid>
+      <pubDate>Wed, 04 Nov 2026 12:00:00 +0100</pubDate>
+      <category>Technologia</category>
+      <description>Formaty zamknięte i rozbudowane platformy znikają co kilka lat. Czysty tekst, HTML i prosty system plików okazują się zadziwiająco odporne na czas.</description>
+    </item>
+  </channel>
+</rss>

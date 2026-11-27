@@ -19,10 +19,18 @@
     return new Date(b.date) - new Date(a.date);
   });
 
+  const libraryItems = window.LIBRARY_ITEMS || [];
+  const chronicleEvents = window.CHRONICLE_EVENTS || [];
+  const glossaryMap = window.GLOSSARY || {};
+  const symbolCatalog = window.ASTRO_SYMBOLS || {};
+
   const state = {
     thread: 'Wszystkie',
     miscKind: 'Wszystkie',
+    libraryKind: 'Wszystkie',
+    chronicleRealm: 'Wszystkie',
     query: '',
+    focusMode: false,
     fontScale: localStorage.getItem('sploty_font_scale') || 'md'
   };
 
@@ -144,6 +152,15 @@
       return `\u0000CODE${idx}\u0000`;
     });
 
+    const inlineGlosses = [];
+    text = text.replace(/\{\{([^|}]+)\|([^}]+)\}\}/g, (_, term, note) => {
+      const idx = inlineGlosses.length;
+      inlineGlosses.push(
+        `<span class="gloss-term" tabindex="0" role="button" aria-label="${term}: ${note}">${term}<span class="gloss-tip" role="tooltip">${note}</span></span>`
+      );
+      return `\u0000GLOSS${idx}\u0000`;
+    });
+
     text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, url) => {
       const safeHref = sanitizeUrl(url);
       const isExternal = /^https?:\/\//i.test(safeHref);
@@ -154,9 +171,71 @@
     text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     text = text.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, '$1<em>$2</em>');
 
+    text = text.replace(/\u0000GLOSS(\d+)\u0000/g, (_, idx) => inlineGlosses[Number(idx)]);
     text = text.replace(/\u0000CODE(\d+)\u0000/g, (_, idx) => inlineCodes[Number(idx)]);
     return text;
   }
+
+  function escapeRegex(str) {
+    return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // Automatyczne podświetlanie pierwszych wystąpień pojęć ze słownika window.GLOSSARY (z pominięciem tagów HTML)
+  function applyAutoGlossary(html) {
+    const terms = Object.keys(glossaryMap).sort((a, b) => b.length - a.length);
+    if (!terms.length || !html) return html;
+
+    const used = new Set();
+    const parts = String(html).split(/(<[^>]+>)/g);
+    let insideSkipTag = 0;
+
+    return parts
+      .map((part) => {
+        if (part.startsWith('<')) {
+          if (/^<(a|code|pre|h[1-6]|button|figcaption)\b/i.test(part) || /class="[^"]*gloss-term/.test(part)) {
+            insideSkipTag += 1;
+          } else if (/^<\/(a|code|pre|h[1-6]|button|figcaption|span)>/i.test(part) && insideSkipTag > 0) {
+            insideSkipTag -= 1;
+          }
+          return part;
+        }
+        if (insideSkipTag > 0 || !part.trim()) return part;
+
+        let out = part;
+        for (const term of terms) {
+          if (used.has(term)) continue;
+          const re = new RegExp(`(^|[^\\p{L}\\p{N}])(${escapeRegex(term)})(?=$|[^\\p{L}\\p{N}])`, 'iu');
+          if (re.test(out)) {
+            used.add(term);
+            const note = escapeHtml(glossaryMap[term]);
+            out = out.replace(
+              re,
+              (_, pre, matched) =>
+                `${pre}<span class="gloss-term" tabindex="0" role="button" aria-label="${escapeHtml(matched)}: ${note}">${matched}<span class="gloss-tip" role="tooltip">${note}</span></span>`
+            );
+          }
+        }
+        return out;
+      })
+      .join('');
+  }
+
+  function bindGlossTooltips() {
+    const glossEls = Array.from(document.querySelectorAll('.gloss-term'));
+    if (!glossEls.length) return;
+    glossEls.forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = el.classList.contains('is-open');
+        glossEls.forEach((other) => other.classList.remove('is-open'));
+        if (!isOpen) el.classList.add('is-open');
+      });
+    });
+  }
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.gloss-term.is-open').forEach((el) => el.classList.remove('is-open'));
+  });
 
   const MD_IMAGE_RE = /^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/;
 
@@ -543,7 +622,9 @@
     });
   }
 
-  // Przemiana symbolu w astrolabium po każdym pełnym obrocie o 360° (łagodne przenikanie + blask)
+  // Przemiana symbolu w astrolabium po każdym pełnym obrocie o 360° (łagodne przenikanie + blask + Indeks 42 symboli)
+  let astrolabeApi = null;
+
   function initAstrolabeMorph() {
     const rotor = document.getElementById('astro-rotor');
     const astroSvg = document.getElementById('masthead-astrolabe');
@@ -576,9 +657,10 @@
       }, 2050);
     }
 
-    function advanceSymbol() {
+    function setSymbol(targetIdx) {
+      const nextIdx = ((Number(targetIdx) || 0) % symbols.length + symbols.length) % symbols.length;
       symbols[currentIdx].classList.remove('is-active');
-      currentIdx = (currentIdx + 1) % symbols.length;
+      currentIdx = nextIdx;
       const nextSym = symbols[currentIdx];
       nextSym.classList.add('is-active');
       triggerRadiance(nextSym);
@@ -602,10 +684,215 @@
       }
     }
 
+    function advanceSymbol() {
+      setSymbol(currentIdx + 1);
+    }
+
     rotor.addEventListener('animationiteration', advanceSymbol);
     if (stageEl) {
-      stageEl.addEventListener('click', advanceSymbol);
+      stageEl.addEventListener('click', (e) => {
+        if (labelEl && (e.target === labelEl || (labelEl.contains && labelEl.contains(e.target)))) {
+          return;
+        }
+        advanceSymbol();
+      });
     }
+
+    astrolabeApi = {
+      symbols,
+      getCurrentIndex: () => currentIdx,
+      setSymbol
+    };
+  }
+
+  /* ========================================================================
+     Indeks 42 symboli z Astrolabium (modal)
+     ======================================================================== */
+
+  const symbolModalEl = document.getElementById('sploty-symbol-modal');
+  const symbolModalTitleEl = document.getElementById('symbol-modal-title');
+  const symbolModalSvgEl = document.getElementById('symbol-modal-svg');
+  const symbolModalTradEl = document.getElementById('symbol-modal-tradition');
+  const symbolModalOriginEl = document.getElementById('symbol-modal-origin');
+  const symbolModalDescEl = document.getElementById('symbol-modal-desc');
+  const symbolModalFiltersEl = document.getElementById('symbol-modal-filters');
+  const symbolModalGridEl = document.getElementById('symbol-modal-grid');
+  const symbolModalCloseEl = document.getElementById('symbol-modal-close');
+  const symbolModalPrevEl = document.getElementById('symbol-modal-prev');
+  const symbolModalNextEl = document.getElementById('symbol-modal-next');
+  const symbolModalApplyEl = document.getElementById('symbol-modal-apply');
+
+  const symbolModalState = {
+    selectedIdx: 0,
+    tradition: 'Wszystkie'
+  };
+
+  function getSymbolEntries() {
+    if (!astrolabeApi || !astrolabeApi.symbols) return [];
+    return astrolabeApi.symbols.map((el, idx) => {
+      const name = (el.dataset && el.dataset.symbolName) || `Symbol ${idx + 1}`;
+      const info = symbolCatalog[name] || {
+        tradition: 'Symbolika',
+        origin: 'Tradycja historyczno-filozoficzna',
+        description: 'Geometryczny znak włączony do cyklu 42 symboli Astrolabium Splotów.'
+      };
+      return {
+        index: idx,
+        name,
+        tradition: info.tradition,
+        origin: info.origin,
+        description: info.description,
+        innerSvg: el.innerHTML || ''
+      };
+    });
+  }
+
+  function renderSymbolModalContent() {
+    const entries = getSymbolEntries();
+    if (!entries.length || !symbolModalEl) return;
+
+    const idx = ((symbolModalState.selectedIdx % entries.length) + entries.length) % entries.length;
+    symbolModalState.selectedIdx = idx;
+    const item = entries[idx];
+
+    if (symbolModalTitleEl) symbolModalTitleEl.textContent = `${toRoman(idx + 1)}. ${item.name}`;
+    if (symbolModalTradEl) symbolModalTradEl.textContent = item.tradition;
+    if (symbolModalOriginEl) symbolModalOriginEl.textContent = item.origin;
+    if (symbolModalDescEl) symbolModalDescEl.textContent = item.description;
+    if (symbolModalSvgEl) symbolModalSvgEl.innerHTML = item.innerSvg;
+
+    if (symbolModalFiltersEl) {
+      const counts = new Map();
+      counts.set('Wszystkie', entries.length);
+      entries.forEach((e) => counts.set(e.tradition, (counts.get(e.tradition) || 0) + 1));
+
+      symbolModalFiltersEl.innerHTML = Array.from(counts.entries())
+        .map(
+          ([trad, count]) => `
+            <button
+              type="button"
+              class="thread-chip ${symbolModalState.tradition === trad ? 'is-active' : ''}"
+              data-sym-trad="${escapeHtml(trad)}"
+              role="tab"
+              aria-selected="${symbolModalState.tradition === trad}"
+            >
+              ${escapeHtml(trad)}<span class="thread-count">(${count})</span>
+            </button>
+          `
+        )
+        .join('');
+
+      symbolModalFiltersEl.querySelectorAll('[data-sym-trad]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          symbolModalState.tradition = btn.dataset.symTrad;
+          const filtered = entries.filter(
+            (e) => symbolModalState.tradition === 'Wszystkie' || e.tradition === symbolModalState.tradition
+          );
+          if (filtered.length && !filtered.some((e) => e.index === symbolModalState.selectedIdx)) {
+            symbolModalState.selectedIdx = filtered[0].index;
+          }
+          renderSymbolModalContent();
+        });
+      });
+    }
+
+    if (symbolModalGridEl) {
+      const visible = entries.filter(
+        (e) => symbolModalState.tradition === 'Wszystkie' || e.tradition === symbolModalState.tradition
+      );
+      symbolModalGridEl.innerHTML = visible
+        .map(
+          (e) => `
+            <button
+              type="button"
+              class="symbol-pill ${e.index === idx ? 'is-active' : ''}"
+              data-sym-idx="${e.index}"
+            >
+              <span class="symbol-pill-num">${toRoman(e.index + 1)}</span>
+              <span class="symbol-pill-name">${escapeHtml(e.name)}</span>
+            </button>
+          `
+        )
+        .join('');
+
+      symbolModalGridEl.querySelectorAll('[data-sym-idx]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          symbolModalState.selectedIdx = Number(btn.dataset.symIdx) || 0;
+          renderSymbolModalContent();
+        });
+      });
+    }
+  }
+
+  function openSymbolModal(startIdx) {
+    if (!symbolModalEl || !astrolabeApi) return;
+    symbolModalState.selectedIdx =
+      typeof startIdx === 'number' ? startIdx : astrolabeApi.getCurrentIndex();
+    symbolModalState.tradition = 'Wszystkie';
+    renderSymbolModalContent();
+    symbolModalEl.hidden = false;
+    if (document.body) document.body.classList.add('is-lightbox-open');
+    if (symbolModalCloseEl && typeof symbolModalCloseEl.focus === 'function') {
+      symbolModalCloseEl.focus();
+    }
+  }
+
+  function closeSymbolModal() {
+    if (!symbolModalEl || symbolModalEl.hidden) return;
+    symbolModalEl.hidden = true;
+    if (document.body) document.body.classList.remove('is-lightbox-open');
+  }
+
+  function initSymbolModal() {
+    const labelEl = document.getElementById('astro-symbol-label');
+    if (labelEl) {
+      labelEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSymbolModal();
+      });
+    }
+
+    if (!symbolModalEl) return;
+    if (symbolModalCloseEl) symbolModalCloseEl.addEventListener('click', closeSymbolModal);
+    if (symbolModalPrevEl) {
+      symbolModalPrevEl.addEventListener('click', () => {
+        symbolModalState.selectedIdx -= 1;
+        renderSymbolModalContent();
+      });
+    }
+    if (symbolModalNextEl) {
+      symbolModalNextEl.addEventListener('click', () => {
+        symbolModalState.selectedIdx += 1;
+        renderSymbolModalContent();
+      });
+    }
+    if (symbolModalApplyEl) {
+      symbolModalApplyEl.addEventListener('click', () => {
+        if (astrolabeApi) {
+          astrolabeApi.setSymbol(symbolModalState.selectedIdx);
+          const entries = getSymbolEntries();
+          const chosen = entries[symbolModalState.selectedIdx];
+          showToast(`Astrolabium: ${chosen ? chosen.name : 'zmieniono symbol'}`);
+        }
+        closeSymbolModal();
+      });
+    }
+
+    symbolModalEl.addEventListener('click', (e) => {
+      if (e.target === symbolModalEl) closeSymbolModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (symbolModalEl.hidden) return;
+      if (e.key === 'Escape') closeSymbolModal();
+      else if (e.key === 'ArrowLeft') {
+        symbolModalState.selectedIdx -= 1;
+        renderSymbolModalContent();
+      } else if (e.key === 'ArrowRight') {
+        symbolModalState.selectedIdx += 1;
+        renderSymbolModalContent();
+      }
+    });
   }
 
   // Odliczanie do Ragnarök według Eddy (Gylfaginning 51: III nieprzerwane zimy Fimbulvetr od najbliższego przesilenia zimowego Jól)
@@ -817,8 +1104,30 @@
     });
   }
 
+  // Przycisk powrotu na górę strony
+  const scrollTopBtnEl = document.getElementById('scroll-top-btn');
+
+  function updateScrollTopBtn() {
+    if (!scrollTopBtnEl) return;
+    scrollTopBtnEl.classList.toggle('is-visible', window.scrollY > 420);
+  }
+
+  if (scrollTopBtnEl) {
+    scrollTopBtnEl.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  function applyFocusMode(enabled) {
+    state.focusMode = Boolean(enabled);
+    if (document.body) {
+      document.body.classList.toggle('is-focus-mode', state.focusMode);
+    }
+  }
+
   initKineticThreads();
   initAstrolabeMorph();
+  initSymbolModal();
   initRagnarokClock();
   initPrivacyNotice();
   initLightbox();
@@ -826,6 +1135,7 @@
   let isReadingArticle = false;
 
   function updateReadingProgress() {
+    updateScrollTopBtn();
     if (!progressEl) return;
     if (!isReadingArticle) {
       progressEl.classList.remove('is-visible');
@@ -870,20 +1180,28 @@
         { label: 'Indeks', url: '#/' },
         { label: 'Wątki', url: '#/watki' },
         { label: 'Miscellanea', url: '#/miscellanea' },
+        { label: 'Biblioteka', url: '#/biblioteka' },
+        { label: 'Kronika', url: '#/kronika' },
         { label: 'O mnie', url: '#/o-mnie' },
         { label: 'Polityka prywatności', url: '#/polityka-prywatnosci' },
+        { label: 'RSS', url: 'feed.xml' },
         ...(config.footerLinks || [])
       ];
       linksEl.innerHTML =
         navLinks
           .map((link) => {
-            const href = sanitizeUrl(link.url);
-            const ext = /^https?:\/\//i.test(href) ? ' target="_blank" rel="noopener noreferrer"' : '';
+            const href = link.url === 'feed.xml' ? 'feed.xml' : sanitizeUrl(link.url);
+            const ext = /^(https?:\/\/|feed\.xml)/i.test(href) ? ' target="_blank" rel="noopener noreferrer"' : '';
             return `<a href="${escapeHtml(href)}"${ext}>${escapeHtml(link.label)}</a>`;
           })
           .join('') +
+        `<button type="button" class="colophon-link-btn" id="open-symbol-index-btn">Symbole (XLII)</button>` +
         `<button type="button" class="colophon-link-btn" id="open-notice-settings-btn">Cookies</button>`;
 
+      const openSymBtn = document.getElementById('open-symbol-index-btn');
+      if (openSymBtn) {
+        openSymBtn.addEventListener('click', () => openSymbolModal());
+      }
       const openNoticeBtn = document.getElementById('open-notice-settings-btn');
       if (openNoticeBtn) {
         openNoticeBtn.addEventListener('click', openPrivacyNotice);
@@ -956,6 +1274,58 @@
       .join('');
   }
 
+  function renderNowSection() {
+    const now = config.now;
+    if (!now) return '';
+
+    const cols = [
+      { key: 'listening', label: 'Teraz słucham', item: now.listening },
+      { key: 'reading', label: 'Teraz czytam', item: now.reading },
+      { key: 'researching', label: 'Teraz badam', item: now.researching }
+    ].filter((c) => c.item && c.item.title);
+
+    if (!cols.length) return '';
+
+    return `
+      <section class="now-shelf reveal" aria-label="Teraz — bieżące odsłuchy, lektury i badania">
+        <div class="now-shelf-head">
+          <span class="now-shelf-title">Teraz · Na biurku i na talerzu</span>
+          <div class="now-shelf-links">
+            <a href="#/biblioteka">Biblioteka i Płytoteka →</a>
+            <a href="#/kronika">Kronika Piastów i Północy →</a>
+          </div>
+        </div>
+        <div class="now-grid">
+          ${cols
+            .map((col) => {
+              const titleHtml = col.item.url
+                ? `<a href="${escapeHtml(sanitizeUrl(col.item.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(col.item.title)} ↗</a>`
+                : escapeHtml(col.item.title);
+              return `
+                <div class="now-card">
+                  <span class="now-card-label">${col.label}</span>
+                  <div class="now-card-title">${titleHtml}</div>
+                  ${col.item.note ? `<p class="now-card-note">${escapeHtml(col.item.note)}</p>` : ''}
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+      </section>
+    `;
+  }
+
+  function openRandomThread() {
+    if (!posts.length) return;
+    const pool = posts.map((p) => `#/wpis/${encodeURIComponent(p.slug)}`);
+    pool.push('#/miscellanea', '#/biblioteka', '#/kronika');
+    const currentHash = window.location.hash || '#/';
+    const candidates = pool.filter((h) => h !== currentHash);
+    const chosen = candidates[Math.floor(Math.random() * candidates.length)] || pool[0];
+    showToast('Nić Urðr wybrała kolejny wątek…');
+    window.location.hash = chosen;
+  }
+
   function renderHome() {
     isReadingArticle = false;
     updateReadingProgress();
@@ -989,20 +1359,32 @@
             .join('')}
         </div>
 
-        <input
-          type="search"
-          id="index-search"
-          class="index-search"
-          placeholder="Szukaj w spisie…"
-          value="${escapeHtml(state.query)}"
-          aria-label="Szukaj w spisie wpisów"
-        />
+        <div class="toolbar-actions">
+          <button type="button" id="random-thread-btn" class="random-thread-btn" title="Nić Urðr — otwórz losowy wpis lub sekcję">
+            <span class="runic-term" aria-hidden="true">ᛟ</span> Losuj
+          </button>
+          <input
+            type="search"
+            id="index-search"
+            class="index-search"
+            placeholder="Szukaj w spisie…"
+            value="${escapeHtml(state.query)}"
+            aria-label="Szukaj w spisie wpisów"
+          />
+        </div>
       </section>
 
       <section id="toc-list" class="toc-list reveal" aria-live="polite">
         ${renderTocList(filtered)}
       </section>
+
+      ${renderNowSection()}
     `;
+
+    const randomBtn = document.getElementById('random-thread-btn');
+    if (randomBtn) {
+      randomBtn.addEventListener('click', openRandomThread);
+    }
 
     const listEl = document.getElementById('toc-list');
     const searchEl = document.getElementById('index-search');
@@ -1255,7 +1637,24 @@
 
     const articleMedia = [];
     const parsed = renderMarkdown(post.content, articleMedia);
+    const proseHtml = applyAutoGlossary(parsed.html);
     const galleryHtml = renderPostGallerySection(post.gallery, post.galleryTitle, articleMedia);
+    const soundtrackHtml =
+      post.soundtrack && post.soundtrack.title
+        ? `
+          <div class="article-soundtrack">
+            <span class="soundtrack-label">Do lektury</span>
+            <span aria-hidden="true">·</span>
+            ${
+              post.soundtrack.url
+                ? `<a href="${escapeHtml(sanitizeUrl(post.soundtrack.url))}" target="_blank" rel="noopener noreferrer">${
+                    post.soundtrack.artist ? `${escapeHtml(post.soundtrack.artist)} — ` : ''
+                  }${escapeHtml(post.soundtrack.title)} ↗</a>`
+                : `<span>${post.soundtrack.artist ? `${escapeHtml(post.soundtrack.artist)} — ` : ''}${escapeHtml(post.soundtrack.title)}</span>`
+            }
+          </div>
+        `
+        : '';
 
     isReadingArticle = true;
     setActiveNav('home');
@@ -1269,6 +1668,7 @@
             <button type="button" class="reader-btn ${state.fontScale === 'sm' ? 'is-active' : ''}" data-scale="sm" title="Mniejszy tekst">A−</button>
             <button type="button" class="reader-btn ${state.fontScale === 'md' ? 'is-active' : ''}" data-scale="md" title="Domyślny tekst">A</button>
             <button type="button" class="reader-btn ${state.fontScale === 'lg' ? 'is-active' : ''}" data-scale="lg" title="Większy tekst">A+</button>
+            <button type="button" id="focus-mode-btn" class="reader-btn ${state.focusMode ? 'is-active' : ''}" title="Ukryj nagłówek do spokojnej lektury">Skupienie</button>
             <button type="button" id="copy-link-btn" class="reader-btn">Kopiuj link</button>
           </div>
         </div>
@@ -1283,6 +1683,7 @@
           </div>
           <h1 class="article-title">${escapeHtml(post.title)}</h1>
           ${post.excerpt ? `<p class="article-standfirst">${escapeHtml(post.excerpt)}</p>` : ''}
+          ${soundtrackHtml}
         </header>
 
         ${
@@ -1303,7 +1704,7 @@
         }
 
         <div class="prose">
-          ${parsed.html}
+          ${proseHtml}
         </div>
 
         ${galleryHtml}
@@ -1392,6 +1793,17 @@
       }
     });
 
+    // Tryb skupienia (ukrycie nagłówka podczas lektury)
+    const focusBtn = document.getElementById('focus-mode-btn');
+    if (focusBtn) {
+      focusBtn.addEventListener('click', () => {
+        applyFocusMode(!state.focusMode);
+        focusBtn.classList.toggle('is-active', state.focusMode);
+        showToast(state.focusMode ? 'Tryb skupienia włączony' : 'Przywrócono pełny widok');
+      });
+    }
+
+    bindGlossTooltips();
     bindLightboxTriggers(articleMedia);
     window.scrollTo({ top: 0, behavior: 'instant' });
     updateReadingProgress();
@@ -1423,12 +1835,215 @@
         </header>
 
         <div class="prose">
-          ${parsed.html}
+          ${applyAutoGlossary(parsed.html)}
         </div>
+
+        ${renderNowSection()}
       </article>
     `;
 
+    bindGlossTooltips();
     bindLightboxTriggers(aboutMedia);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  /* ========================================================================
+     Widok 5a: Biblioteka i Płytoteka (#/biblioteka)
+     ======================================================================== */
+
+  function renderLibrary() {
+    isReadingArticle = false;
+    updateReadingProgress();
+    setActiveNav('');
+    document.title = `Biblioteka i Płytoteka — ${config.siteName}`;
+
+    const counts = new Map();
+    counts.set('Wszystkie', libraryItems.length);
+    libraryItems.forEach((item) => {
+      const k = item.kind || 'Inne';
+      counts.set(k, (counts.get(k) || 0) + 1);
+    });
+
+    function renderRows(list) {
+      if (!list.length) {
+        return `<div class="empty-note">Brak pozycji w tym dziale.</div>`;
+      }
+      return list
+        .map(
+          (item, idx) => `
+            <article class="library-row">
+              <span class="library-num" aria-hidden="true">${toRoman(idx + 1)}</span>
+              <div class="library-meta">
+                <span class="toc-thread">${escapeHtml(item.kind || '')}</span>
+                ${item.year ? `<span class="library-year">${escapeHtml(item.year)}</span>` : ''}
+              </div>
+              <div class="library-main">
+                <h2 class="library-title">
+                  ${item.author ? `<span class="library-author">${escapeHtml(item.author)}</span> — ` : ''}${escapeHtml(item.title)}
+                </h2>
+                ${item.note ? `<p class="library-note">${escapeHtml(item.note)}</p>` : ''}
+              </div>
+            </article>
+          `
+        )
+        .join('');
+    }
+
+    const filtered = libraryItems.filter(
+      (i) => state.libraryKind === 'Wszystkie' || i.kind === state.libraryKind
+    );
+
+    appEl.innerHTML = `
+      <section class="reveal">
+        <div class="reader-bar">
+          <a href="#/" class="back-btn">← Powrót do indeksu</a>
+        </div>
+        <h1 class="page-title">Biblioteka i Płytoteka</h1>
+        <p class="page-lead">Książki, źródła wczesnośredniowieczne oraz płyty, do których wracam przy pisaniu i badaniu wątków Splotów.</p>
+
+        <div class="index-toolbar" aria-label="Filtrowanie biblioteki">
+          <div class="thread-filters" role="tablist" aria-label="Działy biblioteki">
+            ${Array.from(counts.entries())
+              .map(
+                ([name, count]) => `
+                  <button
+                    type="button"
+                    class="thread-chip ${state.libraryKind === name ? 'is-active' : ''}"
+                    data-lib-kind="${escapeHtml(name)}"
+                    role="tab"
+                    aria-selected="${state.libraryKind === name}"
+                  >
+                    ${escapeHtml(name)}<span class="thread-count">(${count})</span>
+                  </button>
+                `
+              )
+              .join('')}
+          </div>
+        </div>
+
+        <div id="library-list" class="library-list" aria-live="polite">
+          ${renderRows(filtered)}
+        </div>
+      </section>
+    `;
+
+    const listEl = document.getElementById('library-list');
+    document.querySelectorAll('[data-lib-kind]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.libraryKind = btn.dataset.libKind;
+        document.querySelectorAll('[data-lib-kind]').forEach((b) => {
+          const active = b.dataset.libKind === state.libraryKind;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-selected', String(active));
+        });
+        const nextList = libraryItems.filter(
+          (i) => state.libraryKind === 'Wszystkie' || i.kind === state.libraryKind
+        );
+        listEl.innerHTML = renderRows(nextList);
+      });
+    });
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  /* ========================================================================
+     Widok 5b: Oś czasu — Kronika Piastów i Północy (#/kronika)
+     ======================================================================== */
+
+  function renderChronicle() {
+    isReadingArticle = false;
+    updateReadingProgress();
+    setActiveNav('');
+    document.title = `Kronika Piastów i Północy — ${config.siteName}`;
+
+    const counts = new Map();
+    counts.set('Wszystkie', chronicleEvents.length);
+    chronicleEvents.forEach((ev) => {
+      const r = ev.realm || 'Inne';
+      counts.set(r, (counts.get(r) || 0) + 1);
+    });
+
+    function renderEvents(list) {
+      if (!list.length) {
+        return `<div class="empty-note">Brak wydarzeń dla wybranego nurtu.</div>`;
+      }
+      return list
+        .map(
+          (ev) => `
+            <article class="chronicle-item">
+              <div class="chronicle-year-col">
+                <span class="chronicle-year">${escapeHtml(ev.year)}</span>
+                <span class="chronicle-realm">${escapeHtml(ev.realm)}</span>
+              </div>
+              <div class="chronicle-body">
+                <h2 class="chronicle-title">${escapeHtml(ev.title)}</h2>
+                <p class="chronicle-text">${escapeHtml(ev.text)}</p>
+                ${
+                  ev.postSlug
+                    ? `<a class="chronicle-link" href="#/wpis/${encodeURIComponent(ev.postSlug)}">Czytaj powiązany esej →</a>`
+                    : ''
+                }
+              </div>
+            </article>
+          `
+        )
+        .join('');
+    }
+
+    const filtered = chronicleEvents.filter(
+      (e) => state.chronicleRealm === 'Wszystkie' || e.realm === state.chronicleRealm
+    );
+
+    appEl.innerHTML = `
+      <section class="reveal">
+        <div class="reader-bar">
+          <a href="#/" class="back-btn">← Powrót do indeksu</a>
+        </div>
+        <h1 class="page-title">Kronika Piastów i Północy</h1>
+        <p class="page-lead">Równoległa oś czasu spinająca budowę monarchii pierwszych Piastów z epoką wikingów i kulturą Północy (VIII–XI wiek).</p>
+
+        <div class="index-toolbar" aria-label="Filtrowanie kroniki">
+          <div class="thread-filters" role="tablist" aria-label="Nurty kroniki">
+            ${Array.from(counts.entries())
+              .map(
+                ([name, count]) => `
+                  <button
+                    type="button"
+                    class="thread-chip ${state.chronicleRealm === name ? 'is-active' : ''}"
+                    data-chr-realm="${escapeHtml(name)}"
+                    role="tab"
+                    aria-selected="${state.chronicleRealm === name}"
+                  >
+                    ${escapeHtml(name)}<span class="thread-count">(${count})</span>
+                  </button>
+                `
+              )
+              .join('')}
+          </div>
+        </div>
+
+        <div id="chronicle-timeline" class="chronicle-timeline" aria-live="polite">
+          ${renderEvents(filtered)}
+        </div>
+      </section>
+    `;
+
+    const listEl = document.getElementById('chronicle-timeline');
+    document.querySelectorAll('[data-chr-realm]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.chronicleRealm = btn.dataset.chrRealm;
+        document.querySelectorAll('[data-chr-realm]').forEach((b) => {
+          const active = b.dataset.chrRealm === state.chronicleRealm;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-selected', String(active));
+        });
+        const nextList = chronicleEvents.filter(
+          (e) => state.chronicleRealm === 'Wszystkie' || e.realm === state.chronicleRealm
+        );
+        listEl.innerHTML = renderEvents(nextList);
+      });
+    });
+
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
@@ -1519,8 +2134,13 @@
 
   function handleRoute() {
     closeLightbox();
+    closeSymbolModal();
     const hash = window.location.hash || '#/';
     const isAbout = hash === '#/o-mnie';
+    const isArticle = /^#\/wpis\/.+/.test(hash);
+    if (!isArticle && state.focusMode) {
+      applyFocusMode(false);
+    }
 
     if (document.body) {
       document.body.classList.toggle('is-about-page', isAbout);
@@ -1546,6 +2166,16 @@
 
     if (hash === '#/o-mnie') {
       renderAbout();
+      return;
+    }
+
+    if (hash === '#/biblioteka') {
+      renderLibrary();
+      return;
+    }
+
+    if (hash === '#/kronika') {
+      renderChronicle();
       return;
     }
 
