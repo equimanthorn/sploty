@@ -26,7 +26,7 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="styles.css?v=20261122b" />
+  <link rel="stylesheet" href="styles.css?v=20261127" />
 </head>
 <body>
   <!-- Cienka linia postępu lektury -->
@@ -909,10 +909,36 @@
     </div>
   </aside>
 
+  <!-- Pełnoekranowy podgląd zdjęć i galerii (Lightbox) -->
+  <div
+    id="sploty-lightbox"
+    class="lightbox"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Podgląd zdjęcia"
+    hidden
+  >
+    <div class="lightbox-topbar">
+      <span id="lightbox-counter" class="lightbox-counter">I / I</span>
+      <button type="button" id="lightbox-close" class="lightbox-icon-btn" aria-label="Zamknij podgląd (Esc)" title="Zamknij (Esc)">✕</button>
+    </div>
+
+    <div class="lightbox-stage">
+      <button type="button" id="lightbox-prev" class="lightbox-nav lightbox-prev" aria-label="Poprzednie zdjęcie" title="Poprzednie (←)">‹</button>
+      <figure class="lightbox-figure">
+        <img id="lightbox-img" class="lightbox-img" src="" alt="" />
+        <figcaption id="lightbox-caption" class="lightbox-caption"></figcaption>
+      </figure>
+      <button type="button" id="lightbox-next" class="lightbox-nav lightbox-next" aria-label="Następne zdjęcie" title="Następne (→)">›</button>
+    </div>
+
+    <div id="lightbox-thumbs" class="lightbox-thumbs" aria-label="Miniatury galerii"></div>
+  </div>
+
   <!-- Subtelne powiadomienie -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="data/posts.js?v=20261122b"></script>
-  <script src="app.js?v=20261122b"></script>
+  <script src="data/posts.js?v=20261127"></script>
+  <script src="app.js?v=20261127"></script>
 </body>
 </html>

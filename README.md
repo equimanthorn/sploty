@@ -28,8 +28,13 @@ Powściągliwy, elegancki dziennik literacki poświęcony **technologii**, **muz
 └── .nojekyll        # Wyłącza przetwarzanie Jekyll
 ```
 
-## Jak dodać nowy wpis lub notatkę do Miscellaneów?
+## Jak dodać nowy wpis, zdjęcia lub galerię?
 
 Otwórz plik `data/posts.js` (na komputerze lub ikoną ołówka ✏️ na GitHubie):
 - Dłuższe artykuły dopisuj na początku tablicy `BLOG_POSTS`.
 - Krótkie różności, odsłuchy i cytaty dopisuj na początku tablicy `MISCELLANEA`.
+- **Zdjęcia**: wrzuć pliki (`.jpg`, `.webp`, `.png`) do folderu `images/` (np. `images/grod-1.jpg`), a następnie:
+  - w treści wpisu (`content`) dodaj `![Podpis](images/grod-1.jpg)` (pojedyncza rycina w ramie *passe-partout*),
+  - wpisz kilka linii `![...](...)` jedna pod drugą bez pustego wiersza, aby utworzyć **galerię śródtekstową**,
+  - lub dodaj do obiektu wpisu pole `gallery: [{ src: 'images/grod-1.jpg', caption: 'Opis' }, ...]` (oraz opcjonalnie `galleryTitle`), aby wyświetlić **redakcyjną galerię** pod tekstem.
+  - Każde zdjęcie otwiera się w pełnoekranowym **Lightboxie** z obsługą klawiatury (`←`, `→`, `Esc`), miniaturek i gestów przesuwania na telefonie.

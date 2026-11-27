@@ -3,6 +3,20 @@
  *
  * Wątki tematyczne: Technologia, Muzyka, Filozofia, Język, Piastowie.
  * Aby dodać nowy wpis, dopisz kolejny obiekt na początku tablicy BLOG_POSTS.
+ *
+ * ZDJĘCIA I GALERIE W POSTACH:
+ * 1) Pojedyncze zdjęcie w treści (content):
+ *      ![Podpis pod zdjęciem](images/moj-plik.jpg)
+ * 2) Galeria śródtekstowa — wpisz 2 lub więcej zdjęć jedno pod drugim bez pustej linii:
+ *      ![Pierwsze zdjęcie](images/foto-1.jpg)
+ *      ![Drugie zdjęcie](images/foto-2.jpg)
+ *      ![Trzecie zdjęcie](images/foto-3.jpg)
+ * 3) Dedykowana galeria pod artykułem — dodaj pole `gallery` (i opcjonalnie `galleryTitle`):
+ *      galleryTitle: 'Galeria · Dokumentacja',
+ *      gallery: [
+ *        { src: 'images/foto-1.jpg', caption: 'Opis pierwszego kadru' },
+ *        { src: 'images/foto-2.jpg', caption: 'Opis drugiego kadru' }
+ *      ]
  */
 
 window.SITE_CONFIG = {
@@ -119,7 +133,22 @@ Jednocześnie wczesne polskie średniowiecze nie powstawało w izolacji. Na Ostr
 ---
 
 Zjazd Gnieźnieński w roku 1000, wręczenie Bolesławowi Chrobremu kopii **Włóczni św. Maurycego** i wybicie denarów z napisem *Princes Polonie* nie były nagłym cudem politycznym, lecz zwieńczeniem żmudnej, niezwykle konsekwentnej budowy struktur władzy.
-`
+`,
+    galleryTitle: 'Galeria · Ostrów Lednicki',
+    gallery: [
+      {
+        src: 'images/lednica-palatium.jpg',
+        caption: 'Relikty palatium i kaplicy z X wieku na Ostrowie Lednickim'
+      },
+      {
+        src: 'images/lednica-waly.jpg',
+        caption: 'Zarys wczesnopiastowskich wałów o konstrukcji hakowej'
+      },
+      {
+        src: 'images/lednica-jezioro.jpg',
+        caption: 'Widok na jezioro Lednica i relikty wczesnośredniowiecznego mostu'
+      }
+    ]
   },
   {
     slug: 'cisza-pod-sciana-dzwieku-black-metal',

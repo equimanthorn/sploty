@@ -61,6 +61,14 @@
     return '#';
   }
 
+  function sanitizeMediaUrl(url) {
+    const trimmed = String(url || '').trim();
+    if (!trimmed) return '';
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed) || trimmed.startsWith('//')) return '';
+    return trimmed;
+  }
+
   function threadMark() {
     return '';
   }
@@ -150,12 +158,81 @@
     return text;
   }
 
-  function renderMarkdown(md) {
-    if (!md) return { html: '', headings: [] };
+  const MD_IMAGE_RE = /^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/;
+
+  function renderGalleryGridMarkup(items, mediaCollector, options) {
+    const opts = options || {};
+    const valid = [];
+
+    (items || []).forEach((entry) => {
+      const raw = typeof entry === 'string' ? { src: entry } : entry || {};
+      const src = sanitizeMediaUrl(raw.src);
+      if (!src) return;
+      const caption = String(raw.caption || raw.title || '').trim();
+      const alt = String(raw.alt || caption || 'Ilustracja').trim();
+      const globalIdx = mediaCollector.length;
+      mediaCollector.push({ src, alt, caption });
+      valid.push({ src, alt, caption, globalIdx });
+    });
+
+    if (!valid.length) return '';
+
+    const countAttr = valid.length <= 4 ? String(valid.length) : 'many';
+    const cardsHtml = valid
+      .map((item, idx) => {
+        const plateRoman = toRoman(opts.startNum ? opts.startNum + idx : idx + 1);
+        return `
+          <figure class="gallery-card">
+            <button
+              type="button"
+              class="media-frame"
+              data-lightbox-index="${item.globalIdx}"
+              aria-label="Powiększ zdjęcie${item.caption ? ': ' + escapeHtml(item.caption) : ''}"
+            >
+              <span class="media-viewport">
+                <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt)}" loading="lazy" decoding="async" />
+              </span>
+              <span class="media-plate-num" aria-hidden="true">${plateRoman}</span>
+              <span class="media-zoom-badge" aria-hidden="true">⤢</span>
+            </button>
+            ${item.caption ? `<figcaption class="gallery-card-caption">${escapeHtml(item.caption)}</figcaption>` : ''}
+          </figure>
+        `;
+      })
+      .join('');
+
+    return `<div class="editorial-gallery" data-count="${countAttr}">${cardsHtml}</div>`;
+  }
+
+  function renderPostGallerySection(galleryItems, galleryTitle, mediaCollector) {
+    if (!Array.isArray(galleryItems) || !galleryItems.length) return '';
+    const beforeCount = mediaCollector.length;
+    const gridHtml = renderGalleryGridMarkup(galleryItems, mediaCollector, { startNum: 1 });
+    const addedCount = mediaCollector.length - beforeCount;
+    if (!addedCount) return '';
+
+    const countWord = addedCount === 1 ? 'kadr' : addedCount >= 2 && addedCount <= 4 ? 'kadry' : 'kadrów';
+    const heading = escapeHtml(galleryTitle || 'Galeria');
+
+    return `
+      <section class="post-gallery-section" aria-label="${heading}">
+        <div class="post-gallery-head">
+          <h2 class="post-gallery-title">${heading}</h2>
+          <span class="post-gallery-count">${toRoman(addedCount)} · ${addedCount} ${countWord}</span>
+        </div>
+        ${gridHtml}
+      </section>
+    `;
+  }
+
+  function renderMarkdown(md, mediaCollector) {
+    const media = Array.isArray(mediaCollector) ? mediaCollector : [];
+    if (!md) return { html: '', headings: [], media };
 
     const normalized = String(md).replace(/\r\n/g, '\n').trim();
     const codeBlocks = [];
     const headings = [];
+    let figureCounter = 0;
 
     const withPlaceholders = normalized.replace(
       /```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g,
@@ -189,6 +266,52 @@
       if (/^---+$/.test(line)) {
         html.push('<hr />');
         i++;
+        continue;
+      }
+
+      if (MD_IMAGE_RE.test(line)) {
+        const group = [];
+        while (i < lines.length && MD_IMAGE_RE.test(lines[i].trim())) {
+          const m = lines[i].trim().match(MD_IMAGE_RE);
+          const src = sanitizeMediaUrl(m[2]);
+          if (src) {
+            const alt = String(m[1] || '').trim();
+            const caption = String(m[3] || alt).trim();
+            group.push({ src, alt: alt || caption || 'Ilustracja', caption });
+          }
+          i++;
+        }
+
+        if (group.length === 1) {
+          const img = group[0];
+          figureCounter += 1;
+          const globalIdx = media.length;
+          media.push(img);
+          const figNum = toRoman(figureCounter);
+          html.push(`
+            <figure class="prose-figure">
+              <button
+                type="button"
+                class="media-frame"
+                data-lightbox-index="${globalIdx}"
+                aria-label="Powiększ zdjęcie${img.caption ? ': ' + escapeHtml(img.caption) : ''}"
+              >
+                <span class="media-viewport">
+                  <img src="${escapeHtml(img.src)}" alt="${escapeHtml(img.alt)}" loading="lazy" decoding="async" />
+                </span>
+                <span class="media-zoom-badge" aria-hidden="true">⤢</span>
+              </button>
+              ${
+                img.caption
+                  ? `<figcaption class="prose-figcaption"><span class="figcaption-num">Ryc. ${figNum}</span><span>${escapeHtml(img.caption)}</span></figcaption>`
+                  : ''
+              }
+            </figure>
+          `);
+        } else if (group.length > 1) {
+          html.push(renderGalleryGridMarkup(group, media, { startNum: figureCounter + 1 }));
+          figureCounter += group.length;
+        }
         continue;
       }
 
@@ -241,7 +364,8 @@
       while (
         i < lines.length &&
         lines[i].trim() &&
-        !/^(## |### |> |[-*]\s+|\d+\.\s+|---+$|\u0000BLOCK\d+\u0000$)/.test(lines[i].trim())
+        !/^(## |### |> |[-*]\s+|\d+\.\s+|---+$|\u0000BLOCK\d+\u0000$)/.test(lines[i].trim()) &&
+        !MD_IMAGE_RE.test(lines[i].trim())
       ) {
         paraLines.push(renderInline(lines[i].trim()));
         i++;
@@ -249,7 +373,7 @@
       html.push(`<p>${paraLines.join(' ')}</p>`);
     }
 
-    return { html: html.join('\n'), headings };
+    return { html: html.join('\n'), headings, media };
   }
 
   /* ========================================================================
@@ -537,10 +661,167 @@
     setInterval(updateClock, 1000);
   }
 
+  /* ========================================================================
+     Pełnoekranowy Lightbox dla zdjęć i galerii
+     ======================================================================== */
+
+  const lightboxEl = document.getElementById('sploty-lightbox');
+  const lightboxImgEl = document.getElementById('lightbox-img');
+  const lightboxCapEl = document.getElementById('lightbox-caption');
+  const lightboxCounterEl = document.getElementById('lightbox-counter');
+  const lightboxPrevEl = document.getElementById('lightbox-prev');
+  const lightboxNextEl = document.getElementById('lightbox-next');
+  const lightboxCloseEl = document.getElementById('lightbox-close');
+  const lightboxThumbsEl = document.getElementById('lightbox-thumbs');
+
+  const lightboxState = {
+    items: [],
+    index: 0,
+    lastFocused: null,
+    touchStartX: 0
+  };
+
+  function renderLightboxSlide() {
+    if (!lightboxEl || !lightboxState.items.length) return;
+    const total = lightboxState.items.length;
+    const idx = ((lightboxState.index % total) + total) % total;
+    lightboxState.index = idx;
+    const item = lightboxState.items[idx];
+
+    if (lightboxImgEl) {
+      lightboxImgEl.src = item.src;
+      lightboxImgEl.alt = item.alt || item.caption || 'Zdjęcie';
+    }
+    if (lightboxCapEl) {
+      lightboxCapEl.textContent = item.caption || '';
+    }
+    if (lightboxCounterEl) {
+      lightboxCounterEl.textContent = `${toRoman(idx + 1)} / ${toRoman(total)}`;
+    }
+    if (lightboxPrevEl) lightboxPrevEl.hidden = total <= 1;
+    if (lightboxNextEl) lightboxNextEl.hidden = total <= 1;
+
+    if (lightboxThumbsEl) {
+      lightboxThumbsEl.hidden = total <= 1;
+      lightboxThumbsEl.querySelectorAll('.lightbox-thumb').forEach((btn, i) => {
+        btn.classList.toggle('is-active', i === idx);
+      });
+    }
+  }
+
+  function openLightbox(items, startIndex) {
+    if (!lightboxEl || !Array.isArray(items) || !items.length) return;
+    lightboxState.items = items;
+    lightboxState.index = Number(startIndex) || 0;
+    lightboxState.lastFocused = document.activeElement;
+
+    if (lightboxThumbsEl) {
+      if (items.length > 1) {
+        lightboxThumbsEl.innerHTML = items
+          .map(
+            (item, i) => `
+              <button
+                type="button"
+                class="lightbox-thumb ${i === lightboxState.index ? 'is-active' : ''}"
+                data-lb-thumb="${i}"
+                aria-label="Przejdź do zdjęcia ${i + 1}"
+              >
+                <img src="${escapeHtml(item.src)}" alt="" loading="lazy" />
+              </button>
+            `
+          )
+          .join('');
+        lightboxThumbsEl.querySelectorAll('[data-lb-thumb]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            lightboxState.index = Number(btn.dataset.lbThumb) || 0;
+            renderLightboxSlide();
+          });
+        });
+      } else {
+        lightboxThumbsEl.innerHTML = '';
+      }
+    }
+
+    renderLightboxSlide();
+    lightboxEl.hidden = false;
+    if (document.body) document.body.classList.add('is-lightbox-open');
+    if (lightboxCloseEl && typeof lightboxCloseEl.focus === 'function') {
+      lightboxCloseEl.focus();
+    }
+  }
+
+  function closeLightbox() {
+    if (!lightboxEl || lightboxEl.hidden) return;
+    lightboxEl.hidden = true;
+    if (document.body) document.body.classList.remove('is-lightbox-open');
+    if (lightboxState.lastFocused && typeof lightboxState.lastFocused.focus === 'function') {
+      lightboxState.lastFocused.focus();
+    }
+  }
+
+  function stepLightbox(delta) {
+    if (!lightboxEl || lightboxEl.hidden || lightboxState.items.length <= 1) return;
+    lightboxState.index += delta;
+    renderLightboxSlide();
+  }
+
+  function initLightbox() {
+    if (!lightboxEl) return;
+
+    if (lightboxCloseEl) lightboxCloseEl.addEventListener('click', closeLightbox);
+    if (lightboxPrevEl) lightboxPrevEl.addEventListener('click', () => stepLightbox(-1));
+    if (lightboxNextEl) lightboxNextEl.addEventListener('click', () => stepLightbox(1));
+
+    lightboxEl.addEventListener('click', (e) => {
+      if (e.target === lightboxEl || (e.target && e.target.classList && e.target.classList.contains('lightbox-stage'))) {
+        closeLightbox();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (lightboxEl.hidden) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') stepLightbox(-1);
+      else if (e.key === 'ArrowRight') stepLightbox(1);
+    });
+
+    lightboxEl.addEventListener(
+      'touchstart',
+      (e) => {
+        if (e.changedTouches && e.changedTouches[0]) {
+          lightboxState.touchStartX = e.changedTouches[0].clientX;
+        }
+      },
+      { passive: true }
+    );
+
+    lightboxEl.addEventListener(
+      'touchend',
+      (e) => {
+        if (!e.changedTouches || !e.changedTouches[0]) return;
+        const dx = e.changedTouches[0].clientX - lightboxState.touchStartX;
+        if (Math.abs(dx) >= 42) {
+          stepLightbox(dx < 0 ? 1 : -1);
+        }
+      },
+      { passive: true }
+    );
+  }
+
+  function bindLightboxTriggers(mediaList) {
+    if (!Array.isArray(mediaList) || !mediaList.length) return;
+    document.querySelectorAll('[data-lightbox-index]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        openLightbox(mediaList, Number(btn.dataset.lightboxIndex) || 0);
+      });
+    });
+  }
+
   initKineticThreads();
   initAstrolabeMorph();
   initRagnarokClock();
   initPrivacyNotice();
+  initLightbox();
 
   let isReadingArticle = false;
 
@@ -972,7 +1253,9 @@
     const olderPost = index < posts.length - 1 ? posts[index + 1] : null;
     const related = posts.filter((p) => p.slug !== post.slug && p.category === post.category).slice(0, 3);
 
-    const parsed = renderMarkdown(post.content);
+    const articleMedia = [];
+    const parsed = renderMarkdown(post.content, articleMedia);
+    const galleryHtml = renderPostGallerySection(post.gallery, post.galleryTitle, articleMedia);
 
     isReadingArticle = true;
     setActiveNav('home');
@@ -1022,6 +1305,8 @@
         <div class="prose">
           ${parsed.html}
         </div>
+
+        ${galleryHtml}
 
         <footer class="article-end">
           ${
@@ -1107,6 +1392,7 @@
       }
     });
 
+    bindLightboxTriggers(articleMedia);
     window.scrollTo({ top: 0, behavior: 'instant' });
     updateReadingProgress();
   }
@@ -1121,7 +1407,8 @@
     setActiveNav('about');
     document.title = `${config.about.title} — ${config.siteName}`;
 
-    const parsed = renderMarkdown(config.about.content);
+    const aboutMedia = [];
+    const parsed = renderMarkdown(config.about.content, aboutMedia);
 
     appEl.innerHTML = `
       <article class="reveal">
@@ -1141,6 +1428,7 @@
       </article>
     `;
 
+    bindLightboxTriggers(aboutMedia);
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
@@ -1230,6 +1518,7 @@
      ======================================================================== */
 
   function handleRoute() {
+    closeLightbox();
     const hash = window.location.hash || '#/';
     const isAbout = hash === '#/o-mnie';
 
