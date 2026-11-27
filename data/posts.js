@@ -130,6 +130,24 @@ Relacja kupca z Tortosy, **Ibrahima ibn Jakuba** (ok. 965/966), ukazuje państwo
 
 Jednocześnie wczesne polskie średniowiecze nie powstawało w izolacji. Na Ostrowie Lednickim, w Gieczu czy nad dolną Odrą w okolicach Wolina krzyżowały się wpływy cesarstwa ottońskiego, Czech i **świata skandynawskiego** — widoczne w typach uzbrojenia, srebrnych skarbach z dirhamami i dynastycznych sojuszach, z małżeństwem **Świętosławy** (córki Mieszka I) na czele.
 
+
+---
+
+{
+  slug: 'moj-wpis',
+  title: 'Tytuł wpisu',
+  date: '2026-11-27',
+  category: 'Piastowie',
+  excerpt: 'Krótki opis...',
+  content: `Treść artykułu...`,
+  galleryTitle: 'Galeria · Ostrów Lednicki',
+  gallery: [
+    { src: 'images/lednica-1.jpg', caption: 'Relikty palatium i kaplicy' },
+    { src: 'images/lednica-2.jpg', caption: 'Zarys wczesnopiastowskich wałów' },
+    { src: 'images/lednica-3.jpg', caption: 'Widok na jezioro Lednica' }
+  ]
+}
+
 ---
 
 Zjazd Gnieźnieński w roku 1000, wręczenie Bolesławowi Chrobremu kopii **Włóczni św. Maurycego** i wybicie denarów z napisem *Princes Polonie* nie były nagłym cudem politycznym, lecz zwieńczeniem żmudnej, niezwykle konsekwentnej budowy struktur władzy.
